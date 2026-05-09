@@ -84,7 +84,7 @@ VEXX-AI-Business-Suite/
 
 | Email | Senha | Plano |
 |---|---|---|
-| `bsdfai1001@gmail.com` | `@Eujhonny1334` | Enterprise |
+
 | `admin@vexx.ai` | `vexx2026` | Pro (seed legado) |
 
 ---
