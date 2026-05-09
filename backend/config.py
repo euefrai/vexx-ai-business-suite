@@ -69,6 +69,15 @@ class ProductionConfig(Config):
         _db_url = _db_url.replace('postgres://', 'postgresql://', 1)
         
     SQLALCHEMY_DATABASE_URI = _db_url or f"sqlite:///{os.path.join(BASE_DIR, 'database', 'vexx.db')}"
+    
+    if 'postgresql' in SQLALCHEMY_DATABASE_URI:
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            'pool_pre_ping': True,
+            'pool_recycle': 300,
+            'pool_size': 10,
+            'max_overflow': 20,
+        }
+        
     # Cookies só trafegam por HTTPS
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = 'Strict'
