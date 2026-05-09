@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — VEXX AI Business Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/global.css?v=3">
+  <link rel="stylesheet" href="/css/auth.css?v=3">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+</head>
+<body class="auth-body">
+
+  <header class="auth-header">
+    <a href="/" class="auth-logo">
+      <div class="auth-logo-badge">V</div>
+      <span>VEXX AI</span>
+    </a>
+    <a href="/register" class="btn btn-secondary btn-sm">Criar conta</a>
+  </header>
+
+  <main class="auth-main">
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <h1>Bem-vindo de volta</h1>
+        <p>Acesse seu painel empresarial inteligente</p>
+      </div>
+
+      <div class="auth-error" id="auth-error">{% if error %}{{ error }}{% endif %}</div>
+
+      <!-- Form suporta fallback sem JS: envia POST para /api/auth/login -->
+      <form id="login-form" autocomplete="on" method="post" action="/login">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+          <label class="form-label" for="login-email">E-mail</label>
+          <input type="email" class="form-input" name="email" id="login-email"
+                 placeholder="voce@empresa.com" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-password" style="display:flex;justify-content:space-between">
+            <span>Senha</span>
+            <a href="/forgot-password" style="color:#a78bfa;font-size:0.82rem">Esqueceu?</a>
+          </label>
+          <input type="password" class="form-input" name="password" id="login-password"
+                 placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg" id="submit-btn" style="margin-top:8px">
+          Entrar no VEXX AI
+        </button>
+      </form>
+
+      <div style="margin-top:20px;padding:14px;background:var(--surface-md);border-radius:var(--radius);border:1px solid var(--border)">
+        <p style="font-size:0.8rem;color:var(--text-muted);text-align:center;margin-bottom:4px">Demo</p>
+        <p style="font-size:0.82rem;color:var(--text-faint);text-align:center">admin@vexx.ai / vexx2026</p>
+      </div>
+
+      <div class="auth-footer-link">
+        Não tem conta? <a href="/register">Criar agora — é grátis</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function() {
+      function $(id) { return document.getElementById(id); }
+      // Debug bar opcional — só aparece em dev quando ?debug=1 na URL
+      const DEBUG = new URLSearchParams(location.search).has('debug');
+      function dbg(msg) {
+        if (!DEBUG) return;
+        let bar = $('debug-bar');
+        if (!bar) {
+          bar = document.createElement('div');
+          bar.id = 'debug-bar';
+          bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:#a78bfa;padding:6px 12px;font-family:monospace;font-size:11px;z-index:9999;border-top:1px solid #333';
+          bar.innerHTML = '<span id="debug-status"></span>';
+          document.body.appendChild(bar);
+        }
+        const st = $('debug-status');
+        if (st) st.textContent = msg;
+        try { console.log('[VEXX_LOGIN]', msg); } catch {}
+      }
+      dbg('login.js carregado · ' + new Date().toLocaleTimeString());
+
+      const emailInput = $('login-email');
+      const pwInput    = $('login-password');
+      const submitBtn  = $('submit-btn');
+      const errorEl    = $('auth-error');
+
+      if (!submitBtn) { dbg('❌ botão não encontrado'); return; }
+      dbg('handlers prontos · clique em Entrar');
+
+      async function doLogin() {
+        if (submitBtn.disabled) return;
+        if (!emailInput.value || !pwInput.value) {
+          dbg('preencha email e senha');
+          if (!emailInput.value) emailInput.focus();
+          else pwInput.focus();
+          return;
+        }
+
+        if (errorEl) {
+          errorEl.classList.remove('show');
+          errorEl.style.display = 'none';
+        }
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Entrando...';
+        dbg('enviando login...');
+
+        let csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        if (!csrf) {
+          try {
+            const r = await fetch('/api/csrf', { credentials: 'include' });
+            csrf = (await r.json()).token || '';
+          } catch {}
+        }
+
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+            credentials: 'include',
+            body: JSON.stringify({ email: emailInput.value, password: pwInput.value }),
+          });
+          dbg('servidor: HTTP ' + res.status);
+
+          let json = {};
+          try { json = await res.json(); } catch {}
+
+          if (res.ok && json.success) {
+            dbg('✅ login OK · indo para /dashboard');
+            window.location.href = '/dashboard';
+            return;
+          }
+
+          const msg = json.error || json.message || ('Erro HTTP ' + res.status);
+          dbg('❌ ' + msg);
+          if (errorEl) {
+            errorEl.textContent = msg;
+            errorEl.classList.add('show');
+            errorEl.style.display = 'block';
+          }
+        } catch (err) {
+          dbg('❌ falha rede: ' + (err.message || err));
+          if (errorEl) {
+            errorEl.textContent = 'Erro de conexão: ' + (err.message || 'servidor offline');
+            errorEl.classList.add('show');
+            errorEl.style.display = 'block';
+          }
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Entrar no VEXX AI';
+        }
+      }
+
+      // Click no botão
+      submitBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        doLogin();
+      });
+
+      // Enter nos campos também submete
+      [emailInput, pwInput].forEach(inp => {
+        if (!inp) return;
+        inp.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

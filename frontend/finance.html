@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financeiro — VEXX AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/widgets.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark"><span>V</span></div>
+    <div class="brand-text"><span class="brand-name">VEXX AI</span><span class="brand-tagline">Business Suite</span></div>
+    <button class="sidebar-collapse-btn" onclick="toggleCollapse()"><i data-lucide="panel-left-close" size="16"></i></button>
+  </div>
+  <div class="sidebar-search" onclick="openCommandPalette()"><i data-lucide="search" size="14"></i><span>Buscar...</span><kbd>⌘K</kbd></div>
+  <nav class="sidebar-nav">
+    <div class="nav-group"><span class="nav-group-label">Principal</span>
+      <a href="/dashboard"  class="nav-link"><span class="nav-link-icon"><i data-lucide="layout-dashboard" size="16"></i></span><span class="nav-link-label">Dashboard</span></a>
+      <a href="/crm"        class="nav-link"><span class="nav-link-icon"><i data-lucide="users" size="16"></i></span><span class="nav-link-label">CRM</span></a>
+      <a href="/finance"    class="nav-link active"><span class="nav-link-icon"><i data-lucide="wallet" size="16"></i></span><span class="nav-link-label">Financeiro</span></a>
+      <a href="/automation" class="nav-link"><span class="nav-link-icon"><i data-lucide="zap" size="16"></i></span><span class="nav-link-label">Automação</span></a>
+    </div>
+    <div class="nav-group"><span class="nav-group-label">Inteligência</span>
+      <a href="/ai-assistant" class="nav-link"><span class="nav-link-icon"><i data-lucide="bot" size="16"></i></span><span class="nav-link-label">IA Assistente</span></a>
+      <a href="/analytics"    class="nav-link"><span class="nav-link-icon"><i data-lucide="bar-chart-2" size="16"></i></span><span class="nav-link-label">Analytics</span></a>
+    </div>
+    <div class="nav-group"><span class="nav-group-label">Conta</span>
+      <a href="/settings" class="nav-link"><span class="nav-link-icon"><i data-lucide="settings" size="16"></i></span><span class="nav-link-label">Configurações</span></a>
+      <a href="/logout"   class="nav-link nav-link-danger"><span class="nav-link-icon"><i data-lucide="log-out" size="16"></i></span><span class="nav-link-label">Sair</span></a>
+    </div>
+  </nav>
+  <div class="sidebar-user" onclick="toggleUserDropdown()">
+    <div class="user-avi" id="s-user-avi">U</div>
+    <div class="user-meta"><span class="user-meta-name" id="s-user-name">—</span><span class="user-meta-company" id="s-user-company">—</span></div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-btn" onclick="toggleMobileSidebar()"><i data-lucide="menu" size="18"></i></button>
+    <div class="topbar-breadcrumb"><span class="topbar-page">Financeiro</span></div>
+  </div>
+  <div class="topbar-center"><div class="topbar-search" onclick="openCommandPalette()"><i data-lucide="search" size="14"></i><span>Buscar...</span><kbd>⌘K</kbd></div></div>
+  <div class="topbar-right">
+    <div class="topbar-plan"><i data-lucide="zap" size="12"></i> <span id="topbar-plan-label">Free</span></div>
+    <div class="topbar-user" onclick="toggleUserDropdown()">
+      <div class="topbar-user-avi" id="t-user-avi">U</div>
+      <div class="topbar-user-info"><span id="t-user-name">—</span><i data-lucide="chevron-down" size="12"></i></div>
+    </div>
+  </div>
+</header>
+
+<div class="user-dropdown" id="user-dropdown">
+  <div class="user-dropdown-header"><div class="user-avi user-avi-lg" id="d-user-avi">U</div><div><p class="user-dropdown-name" id="d-user-name">—</p><p class="user-dropdown-email" id="d-user-email">—</p></div></div>
+  <div class="dropdown-divider"></div>
+  <a href="/dashboard" class="dropdown-item"><i data-lucide="layout-dashboard" size="14"></i> Dashboard</a>
+  <a href="/settings" class="dropdown-item"><i data-lucide="settings" size="14"></i> Configurações</a>
+  <div class="dropdown-divider"></div>
+  <a href="/logout" class="dropdown-item dropdown-item-danger"><i data-lucide="log-out" size="14"></i> Sair</a>
+</div>
+<div class="cmd-overlay" id="cmd-overlay" onclick="closeCommandPalette()">
+  <div class="cmd-palette" onclick="event.stopPropagation()">
+    <div class="cmd-input-row"><i data-lucide="search" size="16"></i><input type="text" class="cmd-input" id="cmd-input" placeholder="Buscar..." oninput="filterCommands(this.value)" onkeydown="cmdKeyDown(event)"><kbd class="cmd-esc">ESC</kbd></div>
+    <div class="cmd-results" id="cmd-results"></div>
+  </div>
+</div>
+
+<main class="page">
+  <div class="welcome-row">
+    <div class="welcome-text">
+      <h1>Financeiro</h1>
+      <p>Receitas, despesas e gestão de faturas.</p>
+    </div>
+    <div class="welcome-actions">
+      <button class="btn-glass" onclick="openInvoiceModal()"><i data-lucide="file-text" size="14"></i> Nova Fatura</button>
+      <button class="btn-primary-sm" onclick="openTxModal()"><i data-lucide="plus" size="15"></i> Nova Transação</button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi-card kpi-green">
+      <div class="kpi-header">
+        <div class="kpi-icon-box kpi-icon-green"><i data-lucide="arrow-up-right" size="16"></i></div>
+        <span class="kpi-trend kpi-trend-up">Mês</span>
+      </div>
+      <div class="kpi-value" id="fin-income">R$ 0</div>
+      <div class="kpi-label">Receitas do Mês</div>
+    </div>
+    <div class="kpi-card" style="border-color:rgba(244,63,94,0.15)">
+      <div class="kpi-header">
+        <div class="kpi-icon-box" style="background:var(--red-soft);color:var(--red)"><i data-lucide="arrow-down-right" size="16"></i></div>
+        <span class="kpi-trend" style="background:var(--red-soft);color:var(--red)">Mês</span>
+      </div>
+      <div class="kpi-value" id="fin-expenses">R$ 0</div>
+      <div class="kpi-label">Despesas do Mês</div>
+    </div>
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-header">
+        <div class="kpi-icon-box kpi-icon-blue"><i data-lucide="dollar-sign" size="16"></i></div>
+        <span class="kpi-trend kpi-trend-up">Saldo</span>
+      </div>
+      <div class="kpi-value" id="fin-profit">R$ 0</div>
+      <div class="kpi-label">Lucro do Mês</div>
+    </div>
+    <div class="kpi-card kpi-amber">
+      <div class="kpi-header">
+        <div class="kpi-icon-box kpi-icon-amber"><i data-lucide="file-text" size="16"></i></div>
+        <span class="kpi-trend">Pendente</span>
+      </div>
+      <div class="kpi-value" id="fin-pending">R$ 0</div>
+      <div class="kpi-label" id="fin-pending-count">0 faturas pendentes</div>
+    </div>
+  </div>
+
+  <div class="main-grid" style="margin-top:20px">
+    <div class="main-col-left">
+      <!-- Chart -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <div><h3 class="widget-title">Receita & Despesas</h3><p class="widget-subtitle">Últimos 6 meses</p></div>
+        </div>
+        <div class="chart-wrap"><canvas id="finance-chart" height="220"></canvas></div>
+        <div class="chart-legend">
+          <div class="legend-item"><span class="legend-dot" style="background:var(--green)"></span> Receita</div>
+          <div class="legend-item"><span class="legend-dot" style="background:var(--red)"></span> Despesa</div>
+        </div>
+      </div>
+
+      <!-- Transactions -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <div><h3 class="widget-title">Transações</h3><p class="widget-subtitle" id="tx-count">— transações</p></div>
+          <div class="period-tabs">
+            <button class="period-tab active" onclick="filterTx(this,'')">Todas</button>
+            <button class="period-tab" onclick="filterTx(this,'income')">Receitas</button>
+            <button class="period-tab" onclick="filterTx(this,'expense')">Despesas</button>
+          </div>
+        </div>
+        <div id="tx-list-wrap"><div class="tx-list" id="tx-list"><div class="skeleton-item"></div></div></div>
+      </div>
+    </div>
+
+    <div class="main-col-right">
+      <!-- Invoices -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <div><h3 class="widget-title">Faturas</h3><p class="widget-subtitle">Cobranças e status</p></div>
+        </div>
+        <div id="invoices-list"><div class="skeleton-item"></div></div>
+      </div>
+
+      <!-- Overview -->
+      <div class="widget-card overview-card">
+        <div class="widget-header"><h3 class="widget-title">Histórico Total</h3><span class="badge-muted-sm">All-time</span></div>
+        <div class="overview-grid">
+          <div class="overview-stat">
+            <div class="overview-icon" style="background:var(--green-soft)"><i data-lucide="trending-up" size="13" style="color:var(--green)"></i></div>
+            <div><div class="overview-val" id="ov-total-income">R$ 0</div><div class="overview-label">Receita Total</div></div>
+          </div>
+          <div class="overview-stat">
+            <div class="overview-icon" style="background:var(--red-soft)"><i data-lucide="trending-down" size="13" style="color:var(--red)"></i></div>
+            <div><div class="overview-val" id="ov-total-expense">R$ 0</div><div class="overview-label">Despesa Total</div></div>
+          </div>
+          <div class="overview-stat" style="grid-column:1/-1">
+            <div class="overview-icon" style="background:var(--blue-soft)"><i data-lucide="wallet" size="13" style="color:var(--blue)"></i></div>
+            <div><div class="overview-val" id="ov-balance">R$ 0</div><div class="overview-label">Saldo Acumulado</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Transaction Modal -->
+<div class="modal-overlay" id="tx-modal">
+  <div class="modal">
+    <div class="modal-header"><h2>Nova Transação</h2><button class="modal-close" onclick="closeModal('tx-modal')">✕</button></div>
+    <form onsubmit="saveTx(event)">
+      <div class="form-group"><label class="form-label">Tipo</label>
+        <select class="form-select" id="tx-type"><option value="income">Receita</option><option value="expense">Despesa</option></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Valor (R$) *</label><input type="number" class="form-input" id="tx-amount" step="0.01" min="0" required></div>
+        <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="tx-date"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Descrição *</label><input type="text" class="form-input" id="tx-desc" required></div>
+      <div class="form-group"><label class="form-label">Categoria</label><input type="text" class="form-input" id="tx-category" placeholder="Vendas, Marketing, Operacional..."></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('tx-modal')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i data-lucide="save" size="14"></i> Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Invoice Modal -->
+<div class="modal-overlay" id="invoice-modal">
+  <div class="modal">
+    <div class="modal-header"><h2>Nova Fatura</h2><button class="modal-close" onclick="closeModal('invoice-modal')">✕</button></div>
+    <form onsubmit="saveInvoice(event)">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Valor (R$) *</label><input type="number" class="form-input" id="inv-amount" step="0.01" min="0" required></div>
+        <div class="form-group"><label class="form-label">Vencimento</label><input type="date" class="form-input" id="inv-due"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Contato</label>
+        <select class="form-select" id="inv-contact"><option value="">— Nenhum —</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-textarea" id="inv-desc"></textarea></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-select" id="inv-status"><option value="pending">Pendente</option><option value="paid">Pago</option><option value="overdue">Vencida</option></select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('invoice-modal')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i data-lucide="save" size="14"></i> Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+<div id="toast-container"></div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth-check.js"></script>
+<script src="/js/sidebar.js"></script>
+<script src="/js/page-shell.js"></script>
+<script src="/js/finance.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRM — VEXX AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/widgets.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark"><span>V</span></div>
+    <div class="brand-text"><span class="brand-name">VEXX AI</span><span class="brand-tagline">Business Suite</span></div>
+    <button class="sidebar-collapse-btn" onclick="toggleCollapse()"><i data-lucide="panel-left-close" size="16"></i></button>
+  </div>
+  <div class="sidebar-search" onclick="openCommandPalette()"><i data-lucide="search" size="14"></i><span>Buscar...</span><kbd>⌘K</kbd></div>
+  <nav class="sidebar-nav">
+    <div class="nav-group"><span class="nav-group-label">Principal</span>
+      <a href="/dashboard"  class="nav-link"><span class="nav-link-icon"><i data-lucide="layout-dashboard" size="16"></i></span><span class="nav-link-label">Dashboard</span></a>
+      <a href="/crm"        class="nav-link active"><span class="nav-link-icon"><i data-lucide="users" size="16"></i></span><span class="nav-link-label">CRM</span></a>
+      <a href="/finance"    class="nav-link"><span class="nav-link-icon"><i data-lucide="wallet" size="16"></i></span><span class="nav-link-label">Financeiro</span></a>
+      <a href="/automation" class="nav-link"><span class="nav-link-icon"><i data-lucide="zap" size="16"></i></span><span class="nav-link-label">Automação</span></a>
+    </div>
+    <div class="nav-group"><span class="nav-group-label">Inteligência</span>
+      <a href="/ai-assistant" class="nav-link"><span class="nav-link-icon"><i data-lucide="bot" size="16"></i></span><span class="nav-link-label">IA Assistente</span></a>
+      <a href="/analytics"    class="nav-link"><span class="nav-link-icon"><i data-lucide="bar-chart-2" size="16"></i></span><span class="nav-link-label">Analytics</span></a>
+    </div>
+    <div class="nav-group"><span class="nav-group-label">Conta</span>
+      <a href="/settings" class="nav-link"><span class="nav-link-icon"><i data-lucide="settings" size="16"></i></span><span class="nav-link-label">Configurações</span></a>
+      <a href="/logout"   class="nav-link nav-link-danger"><span class="nav-link-icon"><i data-lucide="log-out" size="16"></i></span><span class="nav-link-label">Sair</span></a>
+    </div>
+  </nav>
+  <div class="sidebar-user" onclick="toggleUserDropdown()">
+    <div class="user-avi" id="s-user-avi">U</div>
+    <div class="user-meta"><span class="user-meta-name" id="s-user-name">—</span><span class="user-meta-company" id="s-user-company">—</span></div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-btn" onclick="toggleMobileSidebar()"><i data-lucide="menu" size="18"></i></button>
+    <div class="topbar-breadcrumb"><span class="topbar-page">CRM</span></div>
+  </div>
+  <div class="topbar-center"><div class="topbar-search" onclick="openCommandPalette()"><i data-lucide="search" size="14"></i><span>Buscar...</span><kbd>⌘K</kbd></div></div>
+  <div class="topbar-right">
+    <div class="topbar-plan"><i data-lucide="zap" size="12"></i> <span id="topbar-plan-label">Free</span></div>
+    <div class="topbar-user" onclick="toggleUserDropdown()">
+      <div class="topbar-user-avi" id="t-user-avi">U</div>
+      <div class="topbar-user-info"><span id="t-user-name">—</span><i data-lucide="chevron-down" size="12"></i></div>
+    </div>
+  </div>
+</header>
+
+<div class="user-dropdown" id="user-dropdown">
+  <div class="user-dropdown-header"><div class="user-avi user-avi-lg" id="d-user-avi">U</div><div><p class="user-dropdown-name" id="d-user-name">—</p><p class="user-dropdown-email" id="d-user-email">—</p></div></div>
+  <div class="dropdown-divider"></div>
+  <a href="/dashboard" class="dropdown-item"><i data-lucide="layout-dashboard" size="14"></i> Dashboard</a>
+  <a href="/settings"  class="dropdown-item"><i data-lucide="settings" size="14"></i> Configurações</a>
+  <div class="dropdown-divider"></div>
+  <a href="/logout" class="dropdown-item dropdown-item-danger"><i data-lucide="log-out" size="14"></i> Sair</a>
+</div>
+<div class="cmd-overlay" id="cmd-overlay" onclick="closeCommandPalette()">
+  <div class="cmd-palette" onclick="event.stopPropagation()">
+    <div class="cmd-input-row"><i data-lucide="search" size="16"></i><input type="text" class="cmd-input" id="cmd-input" placeholder="Buscar..." oninput="filterCommands(this.value)" onkeydown="cmdKeyDown(event)"><kbd class="cmd-esc">ESC</kbd></div>
+    <div class="cmd-results" id="cmd-results"></div>
+  </div>
+</div>
+
+<main class="page">
+
+  <div class="welcome-row">
+    <div class="welcome-text">
+      <h1>CRM</h1>
+      <p>Gerencie contatos, leads e seu pipeline de vendas.</p>
+    </div>
+  </div>
+
+  <div class="kpi-row kpi-row-sm">
+    <div class="kpi-mini"><div class="kpi-mini-icon" style="background:var(--blue-soft)"><i data-lucide="users" size="13" style="color:var(--blue)"></i></div><div><div class="kpi-mini-val" id="stat-contacts">0</div><div class="kpi-mini-label">Contatos</div></div></div>
+    <div class="kpi-mini"><div class="kpi-mini-icon" style="background:var(--amber-soft)"><i data-lucide="target" size="13" style="color:var(--amber)"></i></div><div><div class="kpi-mini-val" id="stat-leads">0</div><div class="kpi-mini-label">Leads ativos</div></div></div>
+    <div class="kpi-mini"><div class="kpi-mini-icon" style="background:var(--green-soft)"><i data-lucide="dollar-sign" size="13" style="color:var(--green)"></i></div><div><div class="kpi-mini-val" id="stat-value">R$ 0</div><div class="kpi-mini-label">Valor pipeline</div></div></div>
+    <div class="kpi-mini"><div class="kpi-mini-icon" style="background:var(--purple-soft)"><i data-lucide="check-circle" size="13" style="color:var(--purple)"></i></div><div><div class="kpi-mini-val" id="stat-won">0</div><div class="kpi-mini-label">Ganhos</div></div></div>
+    <div class="kpi-mini"><div class="kpi-mini-icon" style="background:var(--rose-soft)"><i data-lucide="trending-up" size="13" style="color:var(--rose)"></i></div><div><div class="kpi-mini-val" id="stat-conv">0%</div><div class="kpi-mini-label">Conversão</div></div></div>
+  </div>
+
+  <div class="period-tabs" style="margin-bottom:18px;width:fit-content">
+    <button class="period-tab active" onclick="showTab('contacts')" id="tab-contacts">Contatos</button>
+    <button class="period-tab" onclick="showTab('pipeline')" id="tab-pipeline">Pipeline de Leads</button>
+  </div>
+
+  <section id="section-contacts">
+    <div class="widget-card">
+      <div class="widget-header">
+        <div style="flex:1;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <input type="text" id="search-contacts" class="form-input" placeholder="Buscar por nome, email, empresa..." style="max-width:320px" oninput="loadContacts()">
+          <select class="form-select" id="filter-status" onchange="loadContacts()" style="max-width:160px">
+            <option value="">Todos status</option>
+            <option value="active">Ativos</option>
+            <option value="inactive">Inativos</option>
+            <option value="lead">Leads</option>
+          </select>
+        </div>
+        <button class="btn-primary-sm" onclick="openContactModal()"><i data-lucide="plus" size="14"></i> Novo Contato</button>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr><th>Nome</th><th>Email</th><th>Empresa</th><th>Status</th><th style="width:120px">Ações</th></tr>
+          </thead>
+          <tbody id="contacts-body">
+            <tr><td colspan="5"><div class="skeleton-item"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="section-pipeline" style="display:none">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+      <button class="btn-primary-sm" onclick="openLeadModal()"><i data-lucide="plus" size="14"></i> Novo Lead</button>
+    </div>
+    <div class="pipeline-board" id="pipeline-board">
+      <div class="skeleton-item" style="flex:1"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Contact Modal -->
+<div class="modal-overlay" id="contact-modal">
+  <div class="modal">
+    <div class="modal-header"><h2 id="contact-modal-title">Novo Contato</h2><button class="modal-close" onclick="closeModal('contact-modal')">✕</button></div>
+    <form onsubmit="saveContact(event)">
+      <input type="hidden" id="contact-id">
+      <div class="form-group"><label class="form-label">Nome *</label><input type="text" class="form-input" id="contact-name" required></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="contact-email"></div>
+        <div class="form-group"><label class="form-label">Telefone</label><input type="text" class="form-input" id="contact-phone"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Empresa</label><input type="text" class="form-input" id="contact-company"></div>
+        <div class="form-group"><label class="form-label">Cargo</label><input type="text" class="form-input" id="contact-position"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-select" id="contact-status">
+          <option value="active">Ativo</option><option value="inactive">Inativo</option><option value="lead">Lead</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Notas</label><textarea class="form-textarea" id="contact-notes"></textarea></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('contact-modal')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i data-lucide="save" size="14"></i> Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Lead Modal -->
+<div class="modal-overlay" id="lead-modal">
+  <div class="modal">
+    <div class="modal-header"><h2 id="lead-modal-title">Novo Lead</h2><button class="modal-close" onclick="closeModal('lead-modal')">✕</button></div>
+    <form onsubmit="saveLead(event)">
+      <input type="hidden" id="lead-id">
+      <div class="form-group"><label class="form-label">Título *</label><input type="text" class="form-input" id="lead-title" required></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Valor (R$)</label><input type="number" class="form-input" id="lead-value" step="0.01" min="0"></div>
+        <div class="form-group"><label class="form-label">Probabilidade (%)</label><input type="number" class="form-input" id="lead-probability" min="0" max="100" value="50"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Estágio</label>
+          <select class="form-select" id="lead-stage">
+            <option value="prospect">Prospecção</option><option value="qualified">Qualificado</option><option value="proposal">Proposta</option>
+            <option value="negotiation">Negociação</option><option value="closed_won">Ganho</option><option value="closed_lost">Perdido</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Contato</label>
+          <select class="form-select" id="lead-contact"><option value="">— Nenhum —</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Notas</label><textarea class="form-textarea" id="lead-notes"></textarea></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('lead-modal')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i data-lucide="save" size="14"></i> Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+<div id="toast-container"></div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth-check.js"></script>
+<script src="/js/sidebar.js"></script>
+<script src="/js/page-shell.js"></script>
+<script src="/js/crm.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

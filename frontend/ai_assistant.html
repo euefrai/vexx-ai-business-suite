@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Assistente — VEXX AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/widgets.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <style>
+    /* IMPORTANTE: sobrescreve overflow:hidden do dashboard.css que estava
+       cortando o dropdown ao ser exibido */
+    .chat-history { overflow-x: visible !important; overflow-y: auto !important; }
+    .chat-history-item {
+      position: relative;
+      display: flex !important;
+      align-items: center;
+      gap: 6px;
+      padding-right: 36px !important;
+      overflow: visible !important;
+      white-space: normal !important;
+      text-overflow: clip !important;
+    }
+    .conv-title {
+      flex: 1; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .conv-menu-btn {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      width: 24px; height: 24px;
+      border: none; background: transparent;
+      border-radius: 6px;
+      color: var(--text-faint);
+      display: grid; place-items: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity var(--t-fast), background var(--t-fast), color var(--t-fast);
+      z-index: 2;
+    }
+    .chat-history-item:hover .conv-menu-btn,
+    .chat-history-item.active .conv-menu-btn,
+    .chat-history-item.menu-open .conv-menu-btn { opacity: 1; }
+    .conv-menu-btn:hover { background: var(--surface-lg); color: var(--text); }
+
+    .conv-dropdown {
+      position: absolute;
+      top: calc(100% - 4px); right: 4px;
+      min-width: 160px;
+      background: var(--bg-3);
+      border: 1px solid var(--border-md);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+      overflow: hidden;
+      animation: dropdown-in 0.12s ease;
+      padding: 4px;
+    }
+    .conv-dropdown button {
+      display: flex; align-items: center; gap: 8px;
+      width: 100%; padding: 8px 10px;
+      background: none; border: none;
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.82rem; text-align: left;
+      cursor: pointer;
+      transition: all var(--t-fast);
+    }
+    .conv-dropdown button:hover { background: var(--surface-md); color: var(--text); }
+    .conv-dropdown button.danger { color: var(--red); }
+    .conv-dropdown button.danger:hover { background: var(--red-soft); }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark"><span>V</span></div>
+    <div class="brand-text"><span class="brand-name">VEXX AI</span><span class="brand-tagline">Business Suite</span></div>
+    <button class="sidebar-collapse-btn" onclick="toggleCollapse()"><i data-lucide="panel-left-close" size="16"></i></button>
+  </div>
+  <div class="sidebar-search" onclick="openCommandPalette()"><i data-lucide="search" size="14"></i><span>Buscar...</span><kbd>⌘K</kbd></div>
+  <nav class="sidebar-nav">
+    <div class="nav-group"><span class="nav-group-label">Principal</span>
+      <a href="/dashboard"  class="nav-link"><span class="nav-link-icon"><i data-lucide="layout-dashboard" size="16"></i></span><span class="nav-link-label">Dashboard</span></a>
+      <a href="/crm"        class="nav-link"><span class="nav-link-icon"><i data-lucide="users" size="16"></i></span><span class="nav-link-label">CRM</span></a>
+      <a href="/finance"    class="nav-link"><span class="nav-link-icon"><i data-lucide="wallet" size="16"></i></span><span class="nav-link-label">Financeiro</span></a>
+      <a href="/automation" class="nav-link"><span class="nav-link-icon"><i data-lucide="zap" size="16"></i></span><span class="nav-link-label">Automação</span></a>
+    </div>
+    <div class="nav-group"><span class="nav-group-label">Inteligência</span>
+      <a href="/ai-assistant" class="nav-link active"><span class="nav-link-icon"><i data-lucide="bot" size="16"></i></span><span class="nav-link-label">IA Assistente</span></a>
+      <a href="/analytics"    class="nav-link"><span class="nav-link-icon"><i data-lucide="bar-chart-2" size="16"></i></span><span class="nav-link-label">Analytics</span></a>
+    </div>
+    <div class="nav-group"><span class="nav-group-label">Conta</span>
+      <a href="/settings" class="nav-link"><span class="nav-link-icon"><i data-lucide="settings" size="16"></i></span><span class="nav-link-label">Configurações</span></a>
+      <a href="/logout"   class="nav-link nav-link-danger"><span class="nav-link-icon"><i data-lucide="log-out" size="16"></i></span><span class="nav-link-label">Sair</span></a>
+    </div>
+  </nav>
+  <div class="sidebar-user" onclick="toggleUserDropdown()">
+    <div class="user-avi" id="s-user-avi">U</div>
+    <div class="user-meta"><span class="user-meta-name" id="s-user-name">—</span><span class="user-meta-company" id="s-user-company">—</span></div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-btn" onclick="toggleMobileSidebar()"><i data-lucide="menu" size="18"></i></button>
+    <div class="topbar-breadcrumb"><span class="topbar-page">IA Assistente</span></div>
+  </div>
+  <div class="topbar-center"><div class="topbar-search" onclick="openCommandPalette()"><i data-lucide="search" size="14"></i><span>Buscar...</span><kbd>⌘K</kbd></div></div>
+  <div class="topbar-right">
+    <div class="topbar-plan"><i data-lucide="zap" size="12"></i> <span id="topbar-plan-label">Free</span></div>
+    <div class="topbar-user" onclick="toggleUserDropdown()">
+      <div class="topbar-user-avi" id="t-user-avi">U</div>
+      <div class="topbar-user-info"><span id="t-user-name">—</span><i data-lucide="chevron-down" size="12"></i></div>
+    </div>
+  </div>
+</header>
+
+<div class="user-dropdown" id="user-dropdown">
+  <div class="user-dropdown-header"><div class="user-avi user-avi-lg" id="d-user-avi">U</div><div><p class="user-dropdown-name" id="d-user-name">—</p><p class="user-dropdown-email" id="d-user-email">—</p></div></div>
+  <div class="dropdown-divider"></div>
+  <a href="/dashboard" class="dropdown-item"><i data-lucide="layout-dashboard" size="14"></i> Dashboard</a>
+  <a href="/settings" class="dropdown-item"><i data-lucide="settings" size="14"></i> Configurações</a>
+  <div class="dropdown-divider"></div>
+  <a href="/logout" class="dropdown-item dropdown-item-danger"><i data-lucide="log-out" size="14"></i> Sair</a>
+</div>
+<div class="cmd-overlay" id="cmd-overlay" onclick="closeCommandPalette()">
+  <div class="cmd-palette" onclick="event.stopPropagation()">
+    <div class="cmd-input-row"><i data-lucide="search" size="16"></i><input type="text" class="cmd-input" id="cmd-input" placeholder="Buscar..." oninput="filterCommands(this.value)" onkeydown="cmdKeyDown(event)"><kbd class="cmd-esc">ESC</kbd></div>
+    <div class="cmd-results" id="cmd-results"></div>
+  </div>
+</div>
+
+<main class="page" style="padding-bottom:0">
+
+  <div class="welcome-row">
+    <div class="welcome-text">
+      <h1>VEXX AI Assistente</h1>
+      <p>Converse com a IA conectada ao seu negócio.</p>
+    </div>
+    <div class="welcome-actions">
+      <button class="btn-glass" onclick="newConversation()"><i data-lucide="plus" size="14"></i> Nova conversa</button>
+    </div>
+  </div>
+
+  <div class="chat-layout">
+
+    <!-- Sidebar de conversas -->
+    <div class="chat-sidebar">
+      <div class="chat-sidebar-header">
+        <strong style="font-size:.85rem">Conversas</strong>
+        <button class="btn-ghost btn-icon btn-sm" onclick="newConversation()" title="Nova"><i data-lucide="plus" size="13"></i></button>
+      </div>
+      <div class="chat-history" id="chat-history">
+        <div class="skeleton-item"></div>
+      </div>
+    </div>
+
+    <!-- Chat principal -->
+    <div class="chat-main">
+      <div class="chat-messages" id="chat-messages">
+        <div class="ai-card" style="margin:auto;max-width:560px;text-align:center">
+          <div class="ai-avatar-wrap" style="margin:0 auto 16px"><div class="ai-orb"></div><div class="ai-avatar-icon"><i data-lucide="bot" size="22"></i></div></div>
+          <h3 class="widget-title" style="font-size:1.05rem">Como posso ajudar você hoje?</h3>
+          <p class="widget-subtitle" style="margin-bottom:18px">Sugestões para começar:</p>
+          <div class="ai-quick-grid" style="grid-template-columns:1fr 1fr;gap:8px">
+            <button class="ai-quick" onclick="quickAsk('Analise minhas receitas e despesas deste mês')"><i data-lucide="trending-up" size="13"></i> Análise financeira</button>
+            <button class="ai-quick" onclick="quickAsk('Sugira como aumentar minha taxa de conversão de leads')"><i data-lucide="target" size="13"></i> Conversão de leads</button>
+            <button class="ai-quick" onclick="quickAsk('Quais automações posso criar para meu negócio?')"><i data-lucide="zap" size="13"></i> Ideias de automação</button>
+            <button class="ai-quick" onclick="quickAsk('Crie um resumo executivo do meu negócio')"><i data-lucide="file-text" size="13"></i> Resumo executivo</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <textarea id="chat-input" placeholder="Pergunte algo ao VEXX AI..." rows="1" onkeydown="onChatKeyDown(event)"></textarea>
+          <button class="ai-send-btn" onclick="sendMessage()" id="send-btn" style="width:36px;height:36px"><i data-lucide="send" size="14"></i></button>
+        </div>
+        <p style="font-size:.7rem;color:var(--text-faint);margin-top:6px;text-align:center">
+          <i data-lucide="lock" size="10" style="display:inline;vertical-align:-1px"></i>
+          Suas conversas e dados ficam apenas no seu workspace.
+          <a href="/settings" style="color:var(--accent-light)">Configurar API key</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Rename modal -->
+<div class="modal-overlay" id="rename-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <h2 style="font-size:1rem">Renomear conversa</h2>
+      <button class="modal-close" onclick="closeModal('rename-modal')">✕</button>
+    </div>
+    <form id="rename-form">
+      <div class="form-group">
+        <label class="form-label">Novo título</label>
+        <input type="text" class="form-input" id="rename-input" maxlength="120" required autofocus>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('rename-modal')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i data-lucide="check" size="14"></i> Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <h2 style="font-size:1rem">Excluir conversa?</h2>
+      <button class="modal-close" onclick="closeModal('delete-modal')">✕</button>
+    </div>
+    <p style="color:var(--text-muted);font-size:.88rem;line-height:1.6">
+      A conversa <strong id="delete-conv-title" style="color:var(--text)"></strong> será removida permanentemente, junto com todas as mensagens. Esta ação não pode ser desfeita.
+    </p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" onclick="closeModal('delete-modal')">Cancelar</button>
+      <button type="button" id="confirm-delete-btn" class="btn btn-danger"><i data-lucide="trash-2" size="14"></i> Excluir</button>
+    </div>
+  </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+<div id="toast-container"></div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth-check.js"></script>
+<script src="/js/sidebar.js"></script>
+<script src="/js/page-shell.js"></script>
+<script src="/js/ai.js?v=3"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

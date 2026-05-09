@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billing — VEXX AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/widgets.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <style>
+    .plan-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 28px;
+      transition: all var(--t);
+      position: relative;
+    }
+    .plan-card.featured {
+      border-color: rgba(109,40,217,0.4);
+      box-shadow: 0 12px 40px rgba(109,40,217,0.15);
+      background: linear-gradient(135deg, rgba(91,33,182,0.07), rgba(67,56,202,0.04));
+    }
+    .plan-card.current {
+      border-color: var(--green);
+      background: linear-gradient(135deg, rgba(16,185,129,0.05), transparent);
+    }
+    .plan-card.featured::before {
+      content: 'POPULAR';
+      position: absolute;
+      top: -10px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--accent-hover), #4338ca);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 3px 12px;
+      border-radius: 99px;
+    }
+    .plan-card.current::before {
+      content: '✓ ATUAL';
+      position: absolute;
+      top: -10px; left: 50%; transform: translateX(-50%);
+      background: var(--green);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 3px 12px;
+      border-radius: 99px;
+    }
+    .plan-name { font-size: 1.05rem; font-weight: 650; margin-bottom: 4px; }
+    .plan-price {
+      font-size: 2rem; font-weight: 800;
+      letter-spacing: -0.04em;
+      margin: 12px 0;
+    }
+    .plan-price small { font-size: 0.85rem; color: var(--text-faint); font-weight: 400; }
+    .plan-features { list-style: none; margin: 18px 0 24px; padding: 0; }
+    .plan-features li {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .plan-features li::before {
+      content: '✓';
+      color: var(--green); font-weight: 800; flex-shrink: 0;
+    }
+    .usage-bar { height: 6px; background: var(--surface-lg); border-radius: 99px; overflow: hidden; margin-top: 4px; }
+    .usage-fill { height: 100%; background: linear-gradient(90deg, var(--accent-hover), var(--blue)); transition: width 1s; }
+    .usage-fill.warning { background: linear-gradient(90deg, var(--amber), var(--red)); }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark"><span>V</span></div>
+    <div class="brand-text"><span class="brand-name">VEXX AI</span><span class="brand-tagline">Business Suite</span></div>
+    <button class="sidebar-collapse-btn" onclick="toggleCollapse()"><i data-lucide="panel-left-close" size="16"></i></button>
+  </div>
+  <div class="sidebar-search" onclick="openCommandPalette()"><i data-lucide="search" size="14"></i><span>Buscar...</span><kbd>⌘K</kbd></div>
+  <nav class="sidebar-nav">
+    <div class="nav-group"><span class="nav-group-label">Principal</span>
+      <a href="/dashboard"  class="nav-link"><span class="nav-link-icon"><i data-lucide="layout-dashboard" size="16"></i></span><span class="nav-link-label">Dashboard</span></a>
+      <a href="/crm"        class="nav-link"><span class="nav-link-icon"><i data-lucide="users" size="16"></i></span><span class="nav-link-label">CRM</span></a>
+      <a href="/finance"    class="nav-link"><span class="nav-link-icon"><i data-lucide="wallet" size="16"></i></span><span class="nav-link-label">Financeiro</span></a>
+      <a href="/automation" class="nav-link"><span class="nav-link-icon"><i data-lucide="zap" size="16"></i></span><span class="nav-link-label">Automação</span></a>
+    </div>
+    <div class="nav-group"><span class="nav-group-label">Inteligência</span>
+      <a href="/ai-assistant" class="nav-link"><span class="nav-link-icon"><i data-lucide="bot" size="16"></i></span><span class="nav-link-label">IA Assistente</span></a>
+      <a href="/analytics"    class="nav-link"><span class="nav-link-icon"><i data-lucide="bar-chart-2" size="16"></i></span><span class="nav-link-label">Analytics</span></a>
+    </div>
+    <div class="nav-group"><span class="nav-group-label">Conta</span>
+      <a href="/settings" class="nav-link"><span class="nav-link-icon"><i data-lucide="settings" size="16"></i></span><span class="nav-link-label">Configurações</span></a>
+      <a href="/billing"  class="nav-link active"><span class="nav-link-icon"><i data-lucide="credit-card" size="16"></i></span><span class="nav-link-label">Billing</span></a>
+      <a href="/logout"   class="nav-link nav-link-danger"><span class="nav-link-icon"><i data-lucide="log-out" size="16"></i></span><span class="nav-link-label">Sair</span></a>
+    </div>
+  </nav>
+  <div class="sidebar-user" onclick="toggleUserDropdown()">
+    <div class="user-avi" id="s-user-avi">U</div>
+    <div class="user-meta"><span class="user-meta-name" id="s-user-name">—</span><span class="user-meta-company" id="s-user-company">—</span></div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-btn" onclick="toggleMobileSidebar()"><i data-lucide="menu" size="18"></i></button>
+    <div class="topbar-breadcrumb"><span class="topbar-page">Billing</span></div>
+  </div>
+  <div class="topbar-center"><div class="topbar-search" onclick="openCommandPalette()"><i data-lucide="search" size="14"></i><span>Buscar...</span><kbd>⌘K</kbd></div></div>
+  <div class="topbar-right">
+    <div class="topbar-plan"><i data-lucide="zap" size="12"></i> <span id="topbar-plan-label">Free</span></div>
+    <div class="topbar-user" onclick="toggleUserDropdown()">
+      <div class="topbar-user-avi" id="t-user-avi">U</div>
+      <div class="topbar-user-info"><span id="t-user-name">—</span><i data-lucide="chevron-down" size="12"></i></div>
+    </div>
+  </div>
+</header>
+
+<div class="user-dropdown" id="user-dropdown">
+  <div class="user-dropdown-header"><div class="user-avi user-avi-lg" id="d-user-avi">U</div><div><p class="user-dropdown-name" id="d-user-name">—</p><p class="user-dropdown-email" id="d-user-email">—</p></div></div>
+  <div class="dropdown-divider"></div>
+  <a href="/dashboard" class="dropdown-item"><i data-lucide="layout-dashboard" size="14"></i> Dashboard</a>
+  <div class="dropdown-divider"></div>
+  <a href="/logout" class="dropdown-item dropdown-item-danger"><i data-lucide="log-out" size="14"></i> Sair</a>
+</div>
+<div class="cmd-overlay" id="cmd-overlay" onclick="closeCommandPalette()">
+  <div class="cmd-palette" onclick="event.stopPropagation()">
+    <div class="cmd-input-row"><i data-lucide="search" size="16"></i><input type="text" class="cmd-input" id="cmd-input" placeholder="Buscar..." oninput="filterCommands(this.value)" onkeydown="cmdKeyDown(event)"><kbd class="cmd-esc">ESC</kbd></div>
+    <div class="cmd-results" id="cmd-results"></div>
+  </div>
+</div>
+
+<main class="page">
+
+  <div class="welcome-row">
+    <div class="welcome-text">
+      <h1>Plano & Cobrança</h1>
+      <p>Seu uso atual e opções de upgrade.</p>
+    </div>
+  </div>
+
+  <!-- Current usage -->
+  <div class="widget-card">
+    <div class="widget-header">
+      <div><h3 class="widget-title">Uso Atual</h3><p class="widget-subtitle">Plano <strong id="cur-plan-name" style="color:var(--accent-light)">—</strong></p></div>
+    </div>
+    <div id="usage-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px"></div>
+  </div>
+
+  <!-- Plans -->
+  <h2 style="margin:30px 0 16px;font-size:1.15rem">Escolha seu plano</h2>
+  <div id="plans-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+    <div class="skeleton-item" style="height:380px"></div>
+    <div class="skeleton-item" style="height:380px"></div>
+    <div class="skeleton-item" style="height:380px"></div>
+  </div>
+
+  <p style="margin-top:24px;font-size:.78rem;color:var(--text-faint);text-align:center">
+    💳 Pagamentos via Stripe/Mercado Pago em breve. Por enquanto, o upgrade é instantâneo para fins de demonstração.
+  </p>
+
+</main>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+<div id="toast-container"></div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth-check.js"></script>
+<script src="/js/sidebar.js"></script>
+<script src="/js/page-shell.js"></script>
+<script src="/js/billing.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

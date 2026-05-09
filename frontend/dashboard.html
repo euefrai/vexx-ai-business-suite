@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — VEXX AI Business Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/widgets.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <div class="brand-mark">
+      <span>V</span>
+    </div>
+    <div class="brand-text">
+      <span class="brand-name">VEXX AI</span>
+      <span class="brand-tagline">Business Suite</span>
+    </div>
+    <button class="sidebar-collapse-btn" id="collapse-btn" onclick="toggleCollapse()" title="Recolher sidebar">
+      <i data-lucide="panel-left-close" size="16"></i>
+    </button>
+  </div>
+
+  <!-- Search shortcut -->
+  <div class="sidebar-search" onclick="openCommandPalette()">
+    <i data-lucide="search" size="14"></i>
+    <span>Buscar...</span>
+    <kbd>⌘K</kbd>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+
+    <div class="nav-group">
+      <span class="nav-group-label">Principal</span>
+
+      <a href="/dashboard" class="nav-link active" data-tooltip="Dashboard">
+        <span class="nav-link-icon"><i data-lucide="layout-dashboard" size="16"></i></span>
+        <span class="nav-link-label">Dashboard</span>
+      </a>
+
+      <a href="/crm" class="nav-link" data-tooltip="CRM">
+        <span class="nav-link-icon"><i data-lucide="users" size="16"></i></span>
+        <span class="nav-link-label">CRM</span>
+        <span class="nav-link-count" id="nav-crm-count">—</span>
+      </a>
+
+      <a href="/finance" class="nav-link" data-tooltip="Financeiro">
+        <span class="nav-link-icon"><i data-lucide="wallet" size="16"></i></span>
+        <span class="nav-link-label">Financeiro</span>
+      </a>
+
+      <a href="/automation" class="nav-link" data-tooltip="Automação">
+        <span class="nav-link-icon"><i data-lucide="zap" size="16"></i></span>
+        <span class="nav-link-label">Automação</span>
+        <span class="nav-link-badge badge-green" id="nav-auto-badge">0</span>
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">Inteligência</span>
+
+      <a href="/ai-assistant" class="nav-link" data-tooltip="IA Assistente">
+        <span class="nav-link-icon"><i data-lucide="bot" size="16"></i></span>
+        <span class="nav-link-label">IA Assistente</span>
+        <span class="nav-link-badge badge-purple">IA</span>
+      </a>
+
+      <a href="/analytics" class="nav-link" data-tooltip="Analytics">
+        <span class="nav-link-icon"><i data-lucide="bar-chart-2" size="16"></i></span>
+        <span class="nav-link-label">Analytics</span>
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">Negócios</span>
+
+      <a href="/billing" class="nav-link" data-tooltip="Billing">
+        <span class="nav-link-icon"><i data-lucide="credit-card" size="16"></i></span>
+        <span class="nav-link-label">Billing</span>
+      </a>
+
+      <a href="#" class="nav-link nav-link-soon" data-tooltip="Em breve">
+        <span class="nav-link-icon"><i data-lucide="users-2" size="16"></i></span>
+        <span class="nav-link-label">Equipe</span>
+        <span class="nav-link-badge badge-muted">SOON</span>
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">Conta</span>
+
+      <a href="/settings" class="nav-link" data-tooltip="Configurações">
+        <span class="nav-link-icon"><i data-lucide="settings" size="16"></i></span>
+        <span class="nav-link-label">Configurações</span>
+      </a>
+
+      <a href="/logout" class="nav-link nav-link-danger" data-tooltip="Sair">
+        <span class="nav-link-icon"><i data-lucide="log-out" size="16"></i></span>
+        <span class="nav-link-label">Sair</span>
+      </a>
+    </div>
+
+  </nav>
+
+  <!-- Plan upgrade CTA -->
+  <div class="sidebar-upgrade" id="sidebar-upgrade">
+    <div class="upgrade-icon"><i data-lucide="sparkles" size="14"></i></div>
+    <div class="upgrade-text">
+      <strong>Upgrade para Pro</strong>
+      <span>Desbloqueie IA ilimitada</span>
+    </div>
+    <a href="/billing" class="upgrade-btn">→</a>
+  </div>
+
+  <!-- User profile -->
+  <div class="sidebar-user" id="sidebar-user" onclick="toggleUserDropdown()">
+    <div class="user-avi" id="s-user-avi">A</div>
+    <div class="user-meta">
+      <span class="user-meta-name" id="s-user-name">Carregando...</span>
+      <span class="user-meta-company" id="s-user-company">—</span>
+    </div>
+    <i data-lucide="chevrons-up-down" size="14" style="color:var(--text-faint);flex-shrink:0"></i>
+  </div>
+
+</aside>
+
+<!-- ══════════════════════════════════════════════════════════
+     TOPBAR
+══════════════════════════════════════════════════════════ -->
+<header class="topbar" id="topbar">
+
+  <div class="topbar-left">
+    <button class="topbar-btn" id="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Menu">
+      <i data-lucide="menu" size="18"></i>
+    </button>
+    <div class="topbar-breadcrumb">
+      <span class="topbar-page">Dashboard</span>
+    </div>
+  </div>
+
+  <div class="topbar-center">
+    <div class="topbar-search" onclick="openCommandPalette()">
+      <i data-lucide="search" size="14"></i>
+      <span>Buscar em tudo...</span>
+      <kbd>⌘K</kbd>
+    </div>
+  </div>
+
+  <div class="topbar-right">
+    <!-- Plan badge -->
+    <div class="topbar-plan" id="topbar-plan">
+      <i data-lucide="zap" size="12"></i>
+      <span id="topbar-plan-label">Free</span>
+    </div>
+
+    <!-- Notifications -->
+    <div class="topbar-icon-btn notif-btn" id="notif-btn" onclick="toggleNotifications()" title="Notificações">
+      <i data-lucide="bell" size="16"></i>
+      <span class="notif-dot" id="notif-dot"></span>
+    </div>
+
+    <!-- User avatar -->
+    <div class="topbar-user" onclick="toggleUserDropdown()" id="topbar-user">
+      <div class="topbar-user-avi" id="t-user-avi">A</div>
+      <div class="topbar-user-info">
+        <span id="t-user-name">Usuário</span>
+        <i data-lucide="chevron-down" size="12"></i>
+      </div>
+    </div>
+  </div>
+
+</header>
+
+<!-- ══════════════════════════════════════════════════════════
+     NOTIFICATIONS PANEL
+══════════════════════════════════════════════════════════ -->
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-panel-header">
+    <span>Notificações</span>
+    <button onclick="markAllRead()" style="font-size:0.78rem;color:var(--accent-light);background:none;border:none;cursor:pointer">Marcar como lidas</button>
+  </div>
+  <div class="notif-list" id="notif-list">
+    <div class="notif-item unread">
+      <div class="notif-icon" style="background:var(--green-soft)"><i data-lucide="trending-up" size="14" style="color:var(--green)"></i></div>
+      <div class="notif-body">
+        <p class="notif-title">Meta mensal atingida!</p>
+        <p class="notif-desc">Receita superou R$ 50K este mês</p>
+        <p class="notif-time">2 min atrás</p>
+      </div>
+    </div>
+    <div class="notif-item unread">
+      <div class="notif-icon" style="background:var(--blue-soft)"><i data-lucide="user-plus" size="14" style="color:var(--blue)"></i></div>
+      <div class="notif-body">
+        <p class="notif-title">Novo lead qualificado</p>
+        <p class="notif-desc">Tech Solutions Ltda entrou no pipeline</p>
+        <p class="notif-time">15 min atrás</p>
+      </div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-icon" style="background:var(--accent-soft)"><i data-lucide="bot" size="14" style="color:var(--accent-light)"></i></div>
+      <div class="notif-body">
+        <p class="notif-title">IA analisou seus dados</p>
+        <p class="notif-desc">3 oportunidades de crescimento identificadas</p>
+        <p class="notif-time">1h atrás</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     USER DROPDOWN
+══════════════════════════════════════════════════════════ -->
+<div class="user-dropdown" id="user-dropdown">
+  <div class="user-dropdown-header">
+    <div class="user-avi user-avi-lg" id="d-user-avi">A</div>
+    <div>
+      <p class="user-dropdown-name" id="d-user-name">Usuário</p>
+      <p class="user-dropdown-email" id="d-user-email">email@vexx.ai</p>
+    </div>
+  </div>
+  <div class="user-dropdown-plan">
+    <i data-lucide="package" size="13"></i>
+    <span>Plano: </span><strong id="d-user-plan">Free</strong>
+  </div>
+  <div class="dropdown-divider"></div>
+  <a href="/settings" class="dropdown-item"><i data-lucide="user" size="14"></i> Meu Perfil</a>
+  <a href="/settings" class="dropdown-item"><i data-lucide="settings" size="14"></i> Configurações</a>
+  <a href="/billing" class="dropdown-item"><i data-lucide="credit-card" size="14"></i> Billing</a>
+  <div class="dropdown-divider"></div>
+  <a href="/logout" class="dropdown-item dropdown-item-danger"><i data-lucide="log-out" size="14"></i> Sair</a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     COMMAND PALETTE
+══════════════════════════════════════════════════════════ -->
+<div class="cmd-overlay" id="cmd-overlay" onclick="closeCommandPalette()">
+  <div class="cmd-palette" onclick="event.stopPropagation()">
+    <div class="cmd-input-row">
+      <i data-lucide="search" size="16" style="color:var(--text-faint)"></i>
+      <input type="text" class="cmd-input" id="cmd-input" placeholder="Buscar páginas, ações, contatos..." oninput="filterCommands(this.value)" onkeydown="cmdKeyDown(event)">
+      <kbd class="cmd-esc">ESC</kbd>
+    </div>
+    <div class="cmd-results" id="cmd-results">
+      <div class="cmd-section-label">Navegação</div>
+      <div class="cmd-item active" data-href="/dashboard"><i data-lucide="layout-dashboard" size="14"></i> Dashboard</div>
+      <div class="cmd-item" data-href="/crm"><i data-lucide="users" size="14"></i> CRM — Contatos e Leads</div>
+      <div class="cmd-item" data-href="/finance"><i data-lucide="wallet" size="14"></i> Financeiro</div>
+      <div class="cmd-item" data-href="/automation"><i data-lucide="zap" size="14"></i> Automação</div>
+      <div class="cmd-item" data-href="/ai-assistant"><i data-lucide="bot" size="14"></i> IA Assistente</div>
+      <div class="cmd-item" data-href="/analytics"><i data-lucide="bar-chart-2" size="14"></i> Analytics</div>
+      <div class="cmd-item" data-href="/settings"><i data-lucide="settings" size="14"></i> Configurações</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN PAGE CONTENT
+══════════════════════════════════════════════════════════ -->
+<main class="page" id="page">
+
+  <!-- ── Welcome Row ── -->
+  <div class="welcome-row">
+    <div class="welcome-text">
+      <h1 id="welcome-heading">Bom dia 👋</h1>
+      <p id="welcome-sub">Aqui está o panorama da sua operação hoje, <strong id="welcome-name">—</strong></p>
+    </div>
+    <div class="welcome-actions">
+      <button class="btn-glass" onclick="window.location='/ai-assistant'">
+        <i data-lucide="bot" size="15"></i> Consultar IA
+      </button>
+      <button class="btn-primary-sm" onclick="openQuickAdd()">
+        <i data-lucide="plus" size="15"></i> Ação rápida
+      </button>
+    </div>
+  </div>
+
+  <!-- ── KPI Primary Row ── -->
+  <div class="kpi-row" id="kpi-primary">
+
+    <div class="kpi-card kpi-green">
+      <div class="kpi-header">
+        <div class="kpi-icon-box kpi-icon-green">
+          <i data-lucide="trending-up" size="16"></i>
+        </div>
+        <span class="kpi-trend kpi-trend-up" id="kpi-rev-change">+0%</span>
+      </div>
+      <div class="kpi-value" id="kpi-rev">R$ 0</div>
+      <div class="kpi-label">Receita do Mês</div>
+      <div class="kpi-sparkline">
+        <svg viewBox="0 0 80 28" class="sparkline sparkline-green">
+          <polyline id="spark-rev" points="" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-header">
+        <div class="kpi-icon-box kpi-icon-blue">
+          <i data-lucide="users" size="16"></i>
+        </div>
+        <span class="kpi-trend" id="kpi-contacts-badge" style="color:var(--text-muted)">total</span>
+      </div>
+      <div class="kpi-value" id="kpi-contacts">0</div>
+      <div class="kpi-label">Contatos Ativos</div>
+      <div class="kpi-progress">
+        <div class="kpi-progress-bar kpi-progress-blue" id="kpi-contacts-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-amber">
+      <div class="kpi-header">
+        <div class="kpi-icon-box kpi-icon-amber">
+          <i data-lucide="target" size="16"></i>
+        </div>
+        <span class="kpi-trend kpi-trend-up" id="kpi-leads-count">0 leads</span>
+      </div>
+      <div class="kpi-value" id="kpi-leads-val">R$ 0</div>
+      <div class="kpi-label">Pipeline de Leads</div>
+      <div class="kpi-sparkline">
+        <svg viewBox="0 0 80 28" class="sparkline sparkline-amber">
+          <polyline id="spark-leads" points="" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-purple">
+      <div class="kpi-header">
+        <div class="kpi-icon-box kpi-icon-purple">
+          <i data-lucide="zap" size="16"></i>
+        </div>
+        <span class="kpi-trend kpi-trend-up" id="kpi-auto-label">ativas</span>
+      </div>
+      <div class="kpi-value" id="kpi-automations">0</div>
+      <div class="kpi-label">Automações Ativas</div>
+      <div class="kpi-progress">
+        <div class="kpi-progress-bar kpi-progress-purple" id="kpi-auto-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── KPI Secondary Row ── -->
+  <div class="kpi-row kpi-row-sm" id="kpi-secondary">
+
+    <div class="kpi-mini">
+      <div class="kpi-mini-icon" style="background:var(--teal-soft)"><i data-lucide="dollar-sign" size="13" style="color:var(--teal)"></i></div>
+      <div>
+        <div class="kpi-mini-val" id="kpi-profit">R$ 0</div>
+        <div class="kpi-mini-label">Lucro do Mês</div>
+      </div>
+      <span class="kpi-trend kpi-trend-up" id="kpi-profit-pct" style="font-size:0.75rem">0%</span>
+    </div>
+
+    <div class="kpi-mini">
+      <div class="kpi-mini-icon" style="background:var(--rose-soft)"><i data-lucide="activity" size="13" style="color:var(--rose)"></i></div>
+      <div>
+        <div class="kpi-mini-val" id="kpi-expenses">R$ 0</div>
+        <div class="kpi-mini-label">Despesas do Mês</div>
+      </div>
+    </div>
+
+    <div class="kpi-mini">
+      <div class="kpi-mini-icon" style="background:var(--lime-soft)"><i data-lucide="percent" size="13" style="color:var(--lime)"></i></div>
+      <div>
+        <div class="kpi-mini-val" id="kpi-conversion">0%</div>
+        <div class="kpi-mini-label">Taxa de Conversão</div>
+      </div>
+    </div>
+
+    <div class="kpi-mini">
+      <div class="kpi-mini-icon" style="background:var(--accent-soft)"><i data-lucide="bot" size="13" style="color:var(--accent-light)"></i></div>
+      <div>
+        <div class="kpi-mini-val" id="kpi-ai-usage">0</div>
+        <div class="kpi-mini-label">Consultas de IA</div>
+      </div>
+    </div>
+
+    <div class="kpi-mini">
+      <div class="kpi-mini-icon" style="background:var(--cyan-soft)"><i data-lucide="layers" size="13" style="color:var(--cyan)"></i></div>
+      <div>
+        <div class="kpi-mini-val" id="kpi-invoices">0</div>
+        <div class="kpi-mini-label">Faturas Pendentes</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Main Content Grid ── -->
+  <div class="main-grid">
+
+    <!-- Left column: Charts -->
+    <div class="main-col-left">
+
+      <!-- Revenue Chart Card -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <div>
+            <h3 class="widget-title">Receita & Despesas</h3>
+            <p class="widget-subtitle">Últimos 6 meses</p>
+          </div>
+          <div class="widget-actions">
+            <div class="period-tabs">
+              <button class="period-tab active" onclick="switchPeriod(this,'6m')">6M</button>
+              <button class="period-tab" onclick="switchPeriod(this,'3m')">3M</button>
+              <button class="period-tab" onclick="switchPeriod(this,'1m')">1M</button>
+            </div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="revenue-chart" height="200"></canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><span class="legend-dot" style="background:var(--green)"></span> Receita</div>
+          <div class="legend-item"><span class="legend-dot" style="background:var(--red)"></span> Despesas</div>
+          <div class="legend-item"><span class="legend-dot" style="background:var(--blue);opacity:.6"></span> Lucro</div>
+        </div>
+      </div>
+
+      <!-- Transactions + Pipeline row -->
+      <div class="sub-grid">
+
+        <!-- Recent Transactions -->
+        <div class="widget-card">
+          <div class="widget-header">
+            <div>
+              <h3 class="widget-title">Transações Recentes</h3>
+              <p class="widget-subtitle" id="tx-subtitle">— transações</p>
+            </div>
+            <a href="/finance" class="link-btn">Ver todas <i data-lucide="arrow-right" size="12"></i></a>
+          </div>
+          <div class="tx-list" id="tx-list">
+            <div class="skeleton-list">
+              <div class="skeleton-item"></div>
+              <div class="skeleton-item"></div>
+              <div class="skeleton-item"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lead Pipeline mini -->
+        <div class="widget-card">
+          <div class="widget-header">
+            <div>
+              <h3 class="widget-title">Pipeline</h3>
+              <p class="widget-subtitle">Funil de vendas</p>
+            </div>
+            <a href="/crm" class="link-btn">CRM <i data-lucide="arrow-right" size="12"></i></a>
+          </div>
+          <div id="pipeline-mini" class="pipeline-mini">
+            <div class="skeleton-list">
+              <div class="skeleton-item"></div>
+              <div class="skeleton-item"></div>
+              <div class="skeleton-item"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Right column: AI + Activity -->
+    <div class="main-col-right">
+
+      <!-- AI Assistant Widget -->
+      <div class="widget-card ai-card">
+        <div class="ai-card-header">
+          <div class="ai-avatar-wrap">
+            <div class="ai-orb"></div>
+            <div class="ai-avatar-icon"><i data-lucide="bot" size="18"></i></div>
+          </div>
+          <div>
+            <h3 class="widget-title">VEXX AI</h3>
+            <p class="widget-subtitle" id="ai-status">Analisando dados...</p>
+          </div>
+          <a href="/ai-assistant" class="link-btn" style="margin-left:auto">Abrir <i data-lucide="arrow-right" size="12"></i></a>
+        </div>
+
+        <div class="ai-insight-box" id="ai-insight-box">
+          <div class="ai-typing">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <div class="ai-quick-grid">
+          <button class="ai-quick" onclick="askAI('Analise o desempenho financeiro deste mês e sugira melhorias')">
+            <i data-lucide="trending-up" size="13"></i> Análise financeira
+          </button>
+          <button class="ai-quick" onclick="askAI('Quais oportunidades de crescimento você identifica?')">
+            <i data-lucide="rocket" size="13"></i> Crescimento
+          </button>
+          <button class="ai-quick" onclick="askAI('Sugira automações para aumentar produtividade')">
+            <i data-lucide="zap" size="13"></i> Automações
+          </button>
+          <button class="ai-quick" onclick="askAI('Analise meu pipeline de leads e conversão')">
+            <i data-lucide="target" size="13"></i> Pipeline
+          </button>
+        </div>
+
+        <!-- Quick chat input -->
+        <div class="ai-input-row">
+          <input type="text" class="ai-inline-input" id="ai-inline-input" placeholder="Pergunte algo para a IA..." onkeydown="if(event.key==='Enter') sendInlineAI()">
+          <button class="ai-send-btn" onclick="sendInlineAI()">
+            <i data-lucide="send" size="14"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <div>
+            <h3 class="widget-title">Atividade Recente</h3>
+            <p class="widget-subtitle">Últimas ações da plataforma</p>
+          </div>
+          <div class="status-dot-live"><span></span> Ao vivo</div>
+        </div>
+        <div class="activity-feed" id="activity-feed">
+          <div class="skeleton-list">
+            <div class="skeleton-item"></div>
+            <div class="skeleton-item"></div>
+            <div class="skeleton-item"></div>
+            <div class="skeleton-item"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overview Stats -->
+      <div class="widget-card overview-card">
+        <div class="widget-header">
+          <h3 class="widget-title">Visão Geral</h3>
+          <span class="badge-muted-sm">Este mês</span>
+        </div>
+        <div class="overview-grid">
+          <div class="overview-stat">
+            <div class="overview-icon" style="background:var(--green-soft)"><i data-lucide="arrow-up-right" size="13" style="color:var(--green)"></i></div>
+            <div>
+              <div class="overview-val" id="ov-income">R$ 0</div>
+              <div class="overview-label">Receitas</div>
+            </div>
+          </div>
+          <div class="overview-stat">
+            <div class="overview-icon" style="background:var(--red-soft)"><i data-lucide="arrow-down-right" size="13" style="color:var(--red)"></i></div>
+            <div>
+              <div class="overview-val" id="ov-expense">R$ 0</div>
+              <div class="overview-label">Despesas</div>
+            </div>
+          </div>
+          <div class="overview-stat">
+            <div class="overview-icon" style="background:var(--blue-soft)"><i data-lucide="users" size="13" style="color:var(--blue)"></i></div>
+            <div>
+              <div class="overview-val" id="ov-leads">0</div>
+              <div class="overview-label">Leads Ativos</div>
+            </div>
+          </div>
+          <div class="overview-stat">
+            <div class="overview-icon" style="background:var(--accent-soft)"><i data-lucide="zap" size="13" style="color:var(--accent-light)"></i></div>
+            <div>
+              <div class="overview-val" id="ov-autos">0</div>
+              <div class="overview-label">Automações</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /.main-grid -->
+
+</main>
+
+<!-- Mobile overlay -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth-check.js"></script>
+<script src="/js/sidebar.js"></script>
+<script src="/js/charts.js"></script>
+<script src="/js/dashboard.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

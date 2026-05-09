@@ -1,0 +1,89 @@
+/* ── Auth pages ── */
+
+.auth-body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 75% 10%, rgba(109,40,217,0.14) 0%, transparent 40%),
+    radial-gradient(circle at 20% 80%, rgba(59,130,246,0.08) 0%, transparent 35%),
+    var(--bg);
+}
+
+.auth-header {
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.auth-logo-badge {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), #4f46e5);
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: white;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.auth-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(13,13,24,0.85);
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-lg);
+}
+
+.auth-card-header { text-align: center; margin-bottom: 32px; }
+.auth-card-header h1 { font-size: 1.6rem; margin-bottom: 6px; }
+.auth-card-header p { font-size: 0.9rem; }
+
+.auth-error {
+  background: var(--red-soft);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  color: var(--red);
+  margin-bottom: 16px;
+  display: none;
+}
+.auth-error.show { display: block; }
+
+.auth-footer-link {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+.auth-footer-link a { color: #a78bfa; font-weight: 500; }
+.auth-footer-link a:hover { text-decoration: underline; }
+
+@media (max-width: 480px) {
+  .auth-card { padding: 28px 20px; }
+  .auth-header { padding: 20px; }
+}

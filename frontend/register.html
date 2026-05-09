@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Conta — VEXX AI Business Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body class="auth-body">
+
+  <header class="auth-header">
+    <a href="/" class="auth-logo">
+      <div class="auth-logo-badge">V</div>
+      <span>VEXX AI</span>
+    </a>
+    <a href="/login" class="btn btn-secondary btn-sm">Já tenho conta</a>
+  </header>
+
+  <main class="auth-main">
+    <div class="auth-card" style="max-width:500px">
+      <div class="auth-card-header">
+        <h1>Comece gratuitamente</h1>
+        <p>Configure seu espaço empresarial em segundos</p>
+      </div>
+
+      <div class="auth-error" id="auth-error">{% if error %}{{ error }}{% endif %}</div>
+
+      <form id="register-form" autocomplete="on" method="post" action="/register">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Nome</label>
+            <input type="text" class="form-input" name="first_name" placeholder="João" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sobrenome</label>
+            <input type="text" class="form-input" name="last_name" placeholder="Silva" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Empresa</label>
+          <input type="text" class="form-input" name="company" placeholder="Nome da sua empresa (opcional)">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">E-mail profissional</label>
+          <input type="email" class="form-input" name="email" placeholder="voce@empresa.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input type="password" class="form-input" name="password" id="pw-input"
+                 placeholder="Mínimo 8 caracteres com letra e número" required minlength="8"
+                 autocomplete="new-password">
+          <div class="pw-meter" id="pw-meter" style="display:none;margin-top:8px">
+            <div class="pw-bar"><div class="pw-fill" id="pw-fill"></div></div>
+            <div class="pw-hints" id="pw-hints" style="font-size:.7rem;color:var(--text-faint);margin-top:6px;line-height:1.5">
+              <span data-rule="length">○ 8+ caracteres</span> ·
+              <span data-rule="letter">○ uma letra</span> ·
+              <span data-rule="number">○ um número</span> ·
+              <span data-rule="upper">○ maiúscula</span>
+            </div>
+          </div>
+        </div>
+        <style>
+          .pw-bar { height: 4px; background: var(--surface-lg); border-radius: 99px; overflow: hidden; }
+          .pw-fill { height: 100%; width: 0%; transition: width .25s, background .25s; background: var(--red); border-radius: 99px; }
+          .pw-fill.s2 { background: var(--amber); }
+          .pw-fill.s3 { background: var(--blue); }
+          .pw-fill.s4 { background: var(--green); }
+          .pw-hints span.met { color: var(--green); }
+          .pw-hints span.met::before { content: '✓ '; }
+          .pw-hints span:not(.met)::before { content: '○ '; }
+          .pw-hints span:not(.met) { color: var(--text-faint); }
+        </style>
+
+        <div class="form-group">
+          <label class="form-label">Plano inicial</label>
+          <select class="form-select" name="plan">
+            <option value="free">Free — Grátis para sempre</option>
+            <option value="pro">Pro — R$ 197/mês</option>
+            <option value="enterprise">Enterprise — R$ 497/mês</option>
+          </select>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-full btn-lg" id="submit-btn" style="margin-top:8px">
+          Criar Conta VEXX AI
+        </button>
+      </form>
+
+      <div class="auth-footer-link">
+        Já tem uma conta? <a href="/login">Fazer login</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById('register-form');
+    const errorEl = document.getElementById('auth-error');
+    const submitBtn = document.getElementById('submit-btn');
+
+    async function doRegister() {
+      if (submitBtn.disabled) return;
+      errorEl.classList.remove('show');
+      errorEl.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Criando conta...';
+
+      const data = Object.fromEntries(new FormData(form));
+      let csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+      if (!csrf) {
+        try {
+          const r = await fetch('/api/csrf', { credentials: 'include' });
+          csrf = (await r.json()).token || '';
+        } catch {}
+      }
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+          credentials: 'include',
+          body: JSON.stringify(data),
+        });
+        let json = {};
+        try { json = await res.json(); } catch {}
+
+        if (res.ok && json.success) {
+          window.location.href = '/dashboard';
+          return;
+        }
+        const msg = json.error || json.message || ('Erro ' + res.status);
+        errorEl.textContent = msg;
+        errorEl.classList.add('show');
+        errorEl.style.display = 'block';
+      } catch (err) {
+        errorEl.textContent = 'Erro de conexão: ' + (err.message || 'servidor offline');
+        errorEl.classList.add('show');
+        errorEl.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Criar Conta VEXX AI';
+      }
+    }
+
+    submitBtn.addEventListener('click', e => { e.preventDefault(); doRegister(); });
+    form.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault(); doRegister();
+      }
+    });
+
+    /* ── Medidor de força de senha ── */
+    const pwInput = document.getElementById('pw-input');
+    const pwMeter = document.getElementById('pw-meter');
+    const pwFill  = document.getElementById('pw-fill');
+    const pwHints = document.getElementById('pw-hints');
+
+    pwInput.addEventListener('input', () => {
+      const v = pwInput.value;
+      if (!v) { pwMeter.style.display = 'none'; return; }
+      pwMeter.style.display = '';
+
+      const rules = {
+        length: v.length >= 8,
+        letter: /[a-zA-Z]/.test(v),
+        number: /[0-9]/.test(v),
+        upper:  /[A-Z]/.test(v) && /[a-z]/.test(v),
+      };
+
+      pwHints.querySelectorAll('span[data-rule]').forEach(el => {
+        el.classList.toggle('met', rules[el.dataset.rule]);
+      });
+
+      let score = 0;
+      if (rules.length) score += 1;
+      if (v.length >= 12) score += 1;
+      if (rules.upper) score += 1;
+      if (rules.number) score += 1;
+      if (/[^a-zA-Z0-9]/.test(v)) score += 1;
+      score = Math.min(score, 4);
+
+      pwFill.className = 'pw-fill s' + score;
+      pwFill.style.width = (score * 25) + '%';
+    });
+  </script>
+</body>
+</html>

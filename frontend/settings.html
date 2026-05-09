@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurações — VEXX AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/widgets.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <style>
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 32px;
+      max-width: 1100px;
+    }
+    .settings-tabs { display: flex; flex-direction: column; gap: 2px; position: sticky; top: calc(var(--topbar-h) + 24px); }
+    .settings-tab {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px;
+      border-radius: var(--r);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--t-fast);
+      background: none; border: none; text-align: left;
+    }
+    .settings-tab:hover  { background: var(--surface-md); color: var(--text); }
+    .settings-tab.active { background: var(--accent-soft); color: var(--accent-light); }
+    .settings-section { display: none; }
+    .settings-section.active { display: block; }
+    .settings-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+    .settings-block h3 { font-size: 1rem; margin-bottom: 4px; }
+    .settings-block .block-desc { font-size: 0.83rem; color: var(--text-faint); margin-bottom: 18px; }
+    .api-key-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      background: var(--surface-md);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      margin-bottom: 8px;
+    }
+    .api-key-icon {
+      width: 32px; height: 32px;
+      background: var(--accent-soft);
+      border-radius: var(--r-sm);
+      display: grid; place-items: center;
+      color: var(--accent-light);
+      flex-shrink: 0;
+    }
+    .api-key-info { flex: 1; min-width: 0; }
+    .api-key-name { font-size: 0.88rem; font-weight: 600; }
+    .api-key-meta { font-size: 0.75rem; color: var(--text-faint); margin-top: 2px; }
+    .provider-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .provider-card {
+      padding: 14px;
+      background: var(--surface-md);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      cursor: pointer;
+      transition: all var(--t-fast);
+      text-align: center;
+    }
+    .provider-card:hover  { border-color: var(--border-md); background: var(--surface-lg); }
+    .provider-card.active { border-color: var(--accent-hover); background: var(--accent-soft); }
+    .provider-name { font-size: 0.85rem; font-weight: 600; margin-top: 8px; }
+    .provider-desc { font-size: 0.72rem; color: var(--text-faint); margin-top: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar (reused from dashboard) -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark"><span>V</span></div>
+    <div class="brand-text">
+      <span class="brand-name">VEXX AI</span>
+      <span class="brand-tagline">Business Suite</span>
+    </div>
+    <button class="sidebar-collapse-btn" onclick="toggleCollapse()"><i data-lucide="panel-left-close" size="16"></i></button>
+  </div>
+
+  <div class="sidebar-search" onclick="openCommandPalette()">
+    <i data-lucide="search" size="14"></i>
+    <span>Buscar...</span>
+    <kbd>⌘K</kbd>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <span class="nav-group-label">Principal</span>
+      <a href="/dashboard"  class="nav-link"><span class="nav-link-icon"><i data-lucide="layout-dashboard" size="16"></i></span><span class="nav-link-label">Dashboard</span></a>
+      <a href="/crm"        class="nav-link"><span class="nav-link-icon"><i data-lucide="users" size="16"></i></span><span class="nav-link-label">CRM</span></a>
+      <a href="/finance"    class="nav-link"><span class="nav-link-icon"><i data-lucide="wallet" size="16"></i></span><span class="nav-link-label">Financeiro</span></a>
+      <a href="/automation" class="nav-link"><span class="nav-link-icon"><i data-lucide="zap" size="16"></i></span><span class="nav-link-label">Automação</span></a>
+    </div>
+    <div class="nav-group">
+      <span class="nav-group-label">Inteligência</span>
+      <a href="/ai-assistant" class="nav-link"><span class="nav-link-icon"><i data-lucide="bot" size="16"></i></span><span class="nav-link-label">IA Assistente</span></a>
+      <a href="/analytics"    class="nav-link"><span class="nav-link-icon"><i data-lucide="bar-chart-2" size="16"></i></span><span class="nav-link-label">Analytics</span></a>
+    </div>
+    <div class="nav-group">
+      <span class="nav-group-label">Conta</span>
+      <a href="/settings" class="nav-link active"><span class="nav-link-icon"><i data-lucide="settings" size="16"></i></span><span class="nav-link-label">Configurações</span></a>
+      <a href="/logout" class="nav-link nav-link-danger"><span class="nav-link-icon"><i data-lucide="log-out" size="16"></i></span><span class="nav-link-label">Sair</span></a>
+    </div>
+  </nav>
+
+  <div class="sidebar-user" id="sidebar-user" onclick="toggleUserDropdown()">
+    <div class="user-avi" id="s-user-avi">A</div>
+    <div class="user-meta">
+      <span class="user-meta-name" id="s-user-name">—</span>
+      <span class="user-meta-company" id="s-user-company">—</span>
+    </div>
+  </div>
+</aside>
+
+<!-- Topbar -->
+<header class="topbar" id="topbar">
+  <div class="topbar-left">
+    <button class="topbar-btn" onclick="toggleMobileSidebar()"><i data-lucide="menu" size="18"></i></button>
+    <div class="topbar-breadcrumb"><span class="topbar-page">Configurações</span></div>
+  </div>
+  <div class="topbar-center"></div>
+  <div class="topbar-right">
+    <div class="topbar-plan" id="topbar-plan"><i data-lucide="zap" size="12"></i> <span id="topbar-plan-label">Free</span></div>
+    <div class="topbar-user" onclick="toggleUserDropdown()">
+      <div class="topbar-user-avi" id="t-user-avi">A</div>
+      <div class="topbar-user-info"><span id="t-user-name">—</span><i data-lucide="chevron-down" size="12"></i></div>
+    </div>
+  </div>
+</header>
+
+<!-- User dropdown (reused) -->
+<div class="user-dropdown" id="user-dropdown">
+  <div class="user-dropdown-header">
+    <div class="user-avi user-avi-lg" id="d-user-avi">A</div>
+    <div>
+      <p class="user-dropdown-name" id="d-user-name">—</p>
+      <p class="user-dropdown-email" id="d-user-email">—</p>
+    </div>
+  </div>
+  <div class="dropdown-divider"></div>
+  <a href="/dashboard" class="dropdown-item"><i data-lucide="layout-dashboard" size="14"></i> Dashboard</a>
+  <a href="/billing"   class="dropdown-item"><i data-lucide="credit-card" size="14"></i> Billing</a>
+  <div class="dropdown-divider"></div>
+  <a href="/logout" class="dropdown-item dropdown-item-danger"><i data-lucide="log-out" size="14"></i> Sair</a>
+</div>
+
+<!-- Command palette overlay (reused) -->
+<div class="cmd-overlay" id="cmd-overlay" onclick="closeCommandPalette()">
+  <div class="cmd-palette" onclick="event.stopPropagation()">
+    <div class="cmd-input-row">
+      <i data-lucide="search" size="16"></i>
+      <input type="text" class="cmd-input" id="cmd-input" placeholder="Buscar..." oninput="filterCommands(this.value)" onkeydown="cmdKeyDown(event)">
+      <kbd class="cmd-esc">ESC</kbd>
+    </div>
+    <div class="cmd-results" id="cmd-results"></div>
+  </div>
+</div>
+
+<!-- Page content -->
+<main class="page">
+  <div class="welcome-row">
+    <div class="welcome-text">
+      <h1>Configurações</h1>
+      <p>Gerencie sua conta, integrações de IA e preferências.</p>
+    </div>
+  </div>
+
+  <div class="settings-grid">
+
+    <!-- Tabs -->
+    <div class="settings-tabs">
+      <button class="settings-tab active" onclick="showTab('api-keys', this)">
+        <i data-lucide="key" size="14"></i> API Keys (IA)
+      </button>
+      <button class="settings-tab" onclick="showTab('profile', this)">
+        <i data-lucide="user" size="14"></i> Perfil
+      </button>
+      <button class="settings-tab" onclick="showTab('security', this)">
+        <i data-lucide="shield" size="14"></i> Segurança
+      </button>
+      <button class="settings-tab" onclick="showTab('plan', this)">
+        <i data-lucide="package" size="14"></i> Plano
+      </button>
+    </div>
+
+    <!-- Sections -->
+    <div>
+
+      <!-- ── API KEYS ── -->
+      <div class="settings-section active" id="section-api-keys">
+
+        <div class="settings-block">
+          <h3>🔑 Conectar Provedor de IA</h3>
+          <p class="block-desc">
+            Adicione sua chave de API para ativar o assistente VEXX AI. Suas chaves são <strong>criptografadas</strong> antes de serem armazenadas.
+          </p>
+
+          <div class="provider-cards" id="provider-cards">
+            <div class="provider-card active" data-provider="openai" onclick="selectProvider(this,'openai')">
+              <div style="font-size:1.6rem">🤖</div>
+              <div class="provider-name">OpenAI</div>
+              <div class="provider-desc">GPT-4, GPT-4o</div>
+            </div>
+            <div class="provider-card" data-provider="anthropic" onclick="selectProvider(this,'anthropic')">
+              <div style="font-size:1.6rem">✨</div>
+              <div class="provider-name">Anthropic</div>
+              <div class="provider-desc">Claude Sonnet/Opus</div>
+            </div>
+            <div class="provider-card" data-provider="deepseek" onclick="selectProvider(this,'deepseek')">
+              <div style="font-size:1.6rem">🐳</div>
+              <div class="provider-name">DeepSeek</div>
+              <div class="provider-desc">DeepSeek V3</div>
+            </div>
+          </div>
+
+          <form id="api-key-form" onsubmit="saveApiKey(event)">
+            <input type="hidden" id="provider" value="openai">
+
+            <div class="form-group">
+              <label class="form-label">Apelido (opcional)</label>
+              <input type="text" class="form-input" id="key-name" placeholder="Ex: Minha chave principal">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Chave de API</label>
+              <input type="password" class="form-input" id="key-value" placeholder="sk-..." autocomplete="off" required>
+              <p style="font-size:0.75rem;color:var(--text-faint);margin-top:6px">
+                <i data-lucide="lock" size="11" style="display:inline;vertical-align:-2px"></i>
+                Sua chave é criptografada com base64 e nunca exposta no frontend.
+              </p>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              <i data-lucide="save" size="14"></i> Salvar Chave
+            </button>
+          </form>
+        </div>
+
+        <div class="settings-block">
+          <h3>Chaves Cadastradas</h3>
+          <p class="block-desc">Suas integrações ativas. A chave em uso será selecionada automaticamente.</p>
+          <div id="keys-list">
+            <div class="skeleton-item"></div>
+          </div>
+        </div>
+
+        <div class="settings-block">
+          <h3>📚 Como obter sua chave</h3>
+          <p class="block-desc">Links diretos para criar uma API key em cada provedor:</p>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:0.85rem">
+            <li><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" style="color:var(--accent-light)">→ OpenAI Dashboard</a> (platform.openai.com/api-keys)</li>
+            <li><a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="color:var(--accent-light)">→ Anthropic Console</a> (console.anthropic.com/settings/keys)</li>
+            <li><a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener" style="color:var(--accent-light)">→ DeepSeek Platform</a> (platform.deepseek.com/api_keys)</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- ── PROFILE ── -->
+      <div class="settings-section" id="section-profile">
+        <div class="settings-block">
+          <h3>Perfil</h3>
+          <p class="block-desc">Atualize suas informações pessoais e empresa.</p>
+          <form onsubmit="saveProfile(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Nome</label>
+                <input type="text" class="form-input" id="p-first" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Sobrenome</label>
+                <input type="text" class="form-input" id="p-last" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" id="p-email" disabled>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Empresa</label>
+              <input type="text" class="form-input" id="p-company">
+            </div>
+            <button class="btn btn-primary" type="submit"><i data-lucide="save" size="14"></i> Salvar</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── SECURITY ── -->
+      <div class="settings-section" id="section-security">
+        <div class="settings-block">
+          <h3>Alterar Senha</h3>
+          <p class="block-desc">Use uma senha forte com pelo menos 8 caracteres.</p>
+          <form onsubmit="savePassword(event)">
+            <div class="form-group">
+              <label class="form-label">Senha Atual</label>
+              <input type="password" class="form-input" id="cur-pw" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nova Senha</label>
+              <input type="password" class="form-input" id="new-pw" minlength="8" required>
+            </div>
+            <button class="btn btn-primary" type="submit"><i data-lucide="key" size="14"></i> Atualizar Senha</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── PLAN ── -->
+      <div class="settings-section" id="section-plan">
+        <div class="settings-block">
+          <h3>Seu Plano Atual</h3>
+          <p class="block-desc">Plano: <strong id="plan-name" style="color:var(--accent-light)">—</strong></p>
+          <a href="/billing" class="btn btn-primary"><i data-lucide="arrow-up-right" size="14"></i> Gerenciar Plano</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+<div id="toast-container"></div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth-check.js"></script>
+<script src="/js/sidebar.js"></script>
+<script>
+/* ── Tab switching ── */
+function showTab(name, btn) {
+  document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`section-${name}`).classList.add('active');
+}
+
+/* ── Provider selection ── */
+function selectProvider(card, provider) {
+  document.querySelectorAll('.provider-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  document.getElementById('provider').value = provider;
+
+  const placeholders = {
+    openai:    'sk-...',
+    anthropic: 'sk-ant-...',
+    deepseek:  'sk-...',
+  };
+  document.getElementById('key-value').placeholder = placeholders[provider] || 'sk-...';
+}
+
+/* ── Save API key ── */
+async function saveApiKey(e) {
+  e.preventDefault();
+  const provider = document.getElementById('provider').value;
+  const key      = document.getElementById('key-value').value.trim();
+  const name     = document.getElementById('key-name').value.trim() || provider;
+
+  if (!key) return;
+
+  try {
+    await vexxAPI.post('/api/settings/api-keys', { provider, key, name });
+    showToast('Chave salva com sucesso!', 'success');
+    document.getElementById('key-value').value = '';
+    document.getElementById('key-name').value  = '';
+    loadKeys();
+  } catch (err) {
+    showToast(err.message || 'Erro ao salvar', 'error');
+  }
+}
+
+/* ── List keys ── */
+async function loadKeys() {
+  const list = document.getElementById('keys-list');
+  try {
+    const res = await vexxAPI.get('/api/settings/api-keys');
+    const keys = res.data || [];
+
+    if (!keys.length) {
+      list.innerHTML = '<p style="color:var(--text-faint);font-size:0.85rem;text-align:center;padding:16px">Nenhuma chave cadastrada ainda.</p>';
+      return;
+    }
+
+    const providerEmoji = { openai: '🤖', anthropic: '✨', deepseek: '🐳' };
+
+    list.innerHTML = keys.map(k => `
+      <div class="api-key-row">
+        <div class="api-key-icon" style="font-size:1rem">${providerEmoji[k.provider] || '🔑'}</div>
+        <div class="api-key-info">
+          <div class="api-key-name">${k.name || k.provider}</div>
+          <div class="api-key-meta">${k.provider} · criada em ${new Date(k.created_at).toLocaleDateString('pt-BR')}</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="deleteKey(${k.id})">
+          <i data-lucide="trash-2" size="12"></i> Remover
+        </button>
+      </div>
+    `).join('');
+
+    if (window.lucide) lucide.createIcons();
+  } catch {
+    list.innerHTML = '<p style="color:var(--red);font-size:0.85rem">Erro ao carregar chaves.</p>';
+  }
+}
+
+async function deleteKey(id) {
+  if (!confirm('Remover esta chave?')) return;
+  try {
+    await vexxAPI.delete(`/api/settings/api-keys/${id}`);
+    showToast('Chave removida.', 'success');
+    loadKeys();
+  } catch (err) {
+    showToast(err.message || 'Erro', 'error');
+  }
+}
+
+/* ── Profile ── */
+async function loadProfile() {
+  const res  = await vexxAPI.get('/api/settings/profile');
+  const u    = res.data;
+  document.getElementById('p-first').value   = u.first_name || '';
+  document.getElementById('p-last').value    = u.last_name  || '';
+  document.getElementById('p-email').value   = u.email      || '';
+  document.getElementById('p-company').value = u.company    || '';
+
+  document.getElementById('s-user-name').textContent    = `${u.first_name} ${u.last_name}`;
+  document.getElementById('s-user-company').textContent = u.company || 'Sem empresa';
+  document.getElementById('t-user-name').textContent    = u.first_name;
+  document.getElementById('d-user-name').textContent    = `${u.first_name} ${u.last_name}`;
+  document.getElementById('d-user-email').textContent   = u.email;
+  const initials = ((u.first_name?.[0] || '') + (u.last_name?.[0] || '')).toUpperCase();
+  document.getElementById('s-user-avi').textContent = initials;
+  document.getElementById('t-user-avi').textContent = initials;
+  document.getElementById('d-user-avi').textContent = initials;
+
+  const planLabel = { free: 'Free', pro: 'Pro ✦', enterprise: 'Enterprise' }[u.plan] || 'Free';
+  document.getElementById('topbar-plan-label').textContent = planLabel;
+  document.getElementById('plan-name').textContent          = planLabel;
+}
+
+async function saveProfile(e) {
+  e.preventDefault();
+  try {
+    await vexxAPI.put('/api/settings/profile', {
+      first_name: document.getElementById('p-first').value,
+      last_name:  document.getElementById('p-last').value,
+      company:    document.getElementById('p-company').value,
+    });
+    showToast('Perfil atualizado!', 'success');
+    loadProfile();
+  } catch (err) {
+    showToast(err.message || 'Erro ao salvar', 'error');
+  }
+}
+
+async function savePassword(e) {
+  e.preventDefault();
+  try {
+    await vexxAPI.put('/api/settings/password', {
+      current_password: document.getElementById('cur-pw').value,
+      new_password:     document.getElementById('new-pw').value,
+    });
+    showToast('Senha alterada com sucesso!', 'success');
+    document.getElementById('cur-pw').value = '';
+    document.getElementById('new-pw').value = '';
+  } catch (err) {
+    showToast(err.message || 'Erro ao alterar senha', 'error');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadProfile();
+  loadKeys();
+});
+
+lucide.createIcons();
+</script>
+</body>
+</html>

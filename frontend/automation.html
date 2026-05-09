@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Automações — VEXX AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/widgets.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <style>
+    .auto-tabs{display:flex;gap:4px;background:var(--surface-md);border:1px solid var(--border);border-radius:var(--r-lg);padding:4px;margin:0 0 22px;width:fit-content;max-width:100%;overflow-x:auto;backdrop-filter:blur(12px)}
+    .auto-tab{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;background:none;border:none;border-radius:var(--r-sm);color:var(--text-muted);font-size:.82rem;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .2s ease}
+    .auto-tab:hover{color:var(--text);background:rgba(255,255,255,.03)}
+    .auto-tab.active{background:linear-gradient(135deg,rgba(109,40,217,.15),rgba(67,56,202,.1));color:var(--accent-light);box-shadow:0 2px 12px rgba(109,40,217,.15),var(--shadow-xs)}
+    .auto-tab .badge-count{background:linear-gradient(135deg,var(--accent-hover),#4338ca);color:#fff;font-size:.66rem;font-weight:700;padding:1px 7px;border-radius:99px;min-width:18px;display:inline-flex;justify-content:center;box-shadow:0 2px 8px rgba(109,40,217,.3)}
+    .auto-guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 24px}
+    .auto-guide-step{background:linear-gradient(135deg,rgba(255,255,255,.025),rgba(255,255,255,.01));border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;display:flex;gap:12px;align-items:flex-start;transition:all .25s ease;position:relative;overflow:hidden}
+    .auto-guide-step::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,rgba(109,40,217,.06),transparent 60%);opacity:0;transition:opacity .3s}
+    .auto-guide-step:hover{border-color:rgba(109,40,217,.2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+    .auto-guide-step:hover::before{opacity:1}
+    .auto-guide-num{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent-hover),#4338ca);color:#fff;font-size:.76rem;font-weight:700;flex-shrink:0;box-shadow:0 3px 10px rgba(109,40,217,.3)}
+    .auto-guide-title{font-size:.88rem;font-weight:650;margin-bottom:4px}
+    .auto-guide-text{font-size:.76rem;color:var(--text-muted);line-height:1.5}
+    @media(max-width:900px){.auto-guide{grid-template-columns:1fr}}
+    .auto-section{display:none}
+    .auto-section.active{display:block;animation:fadeSection .25s ease}
+    @keyframes fadeSection{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .provider-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+    .provider-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;transition:all .25s ease;cursor:pointer;position:relative;overflow:hidden}
+    .provider-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.02));pointer-events:none}
+    .provider-card:hover{border-color:var(--border-md);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+    .provider-card.connected{border-color:rgba(16,185,129,0.25);background:linear-gradient(135deg,rgba(16,185,129,0.04),rgba(16,185,129,0.01))}
+    .provider-card.connected::before{content:'✓';position:absolute;top:12px;right:12px;width:22px;height:22px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:50%;display:grid;place-items:center;font-size:.7rem;font-weight:800;box-shadow:0 2px 8px rgba(16,185,129,.3);z-index:1}
+    .provider-icon{width:44px;height:44px;border-radius:var(--r-sm);display:grid;place-items:center;color:#fff;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+    .provider-name{font-size:.92rem;font-weight:600;margin-bottom:4px}
+    .provider-desc{font-size:.76rem;color:var(--text-faint);line-height:1.45;min-height:32px}
+    .category-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+    .cat-pill{padding:5px 12px;background:var(--surface-md);border:1px solid var(--border);border-radius:99px;color:var(--text-muted);font-size:.76rem;font-weight:500;cursor:pointer;transition:all .2s ease}
+    .cat-pill:hover{background:var(--surface-lg);color:var(--text)}
+    .cat-pill.active{background:linear-gradient(135deg,rgba(109,40,217,.18),rgba(67,56,202,.12));color:var(--accent-light);border-color:rgba(109,40,217,0.35);box-shadow:0 2px 10px rgba(109,40,217,.15)}
+    .workflow-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent-hover);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:10px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;transition:all .2s ease}
+    .workflow-card:hover{border-color:var(--border-md);border-left-color:var(--accent-light);background:rgba(255,255,255,.03);box-shadow:0 4px 20px rgba(0,0,0,.2)}
+    .wf-flow{display:flex;align-items:center;gap:8px;font-size:.76rem;color:var(--text-faint);margin-top:5px}
+    .wf-flow .step{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:var(--surface-md);border-radius:99px;color:var(--text);border:1px solid var(--border);font-weight:500}
+    .wf-flow .arrow{color:var(--accent-light)}
+    .switch{position:relative;display:inline-block;width:38px;height:21px}
+    .switch input{opacity:0;width:0;height:0}
+    .switch-slider{position:absolute;cursor:pointer;inset:0;background:var(--surface-lg);transition:.3s;border-radius:99px}
+    .switch-slider::before{content:'';position:absolute;height:15px;width:15px;left:3px;bottom:3px;background:white;transition:.3s;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+    .switch input:checked+.switch-slider{background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 2px 10px rgba(16,185,129,.3)}
+    .switch input:checked+.switch-slider::before{transform:translateX(17px)}
+    .log-row{display:grid;grid-template-columns:90px 1fr 140px 110px;gap:14px;padding:11px 14px;border-bottom:1px solid var(--border);font-size:.82rem;align-items:center;transition:background .15s}
+    .log-row:hover{background:rgba(255,255,255,.02)}
+    .log-status-success{color:var(--green)} .log-status-error{color:var(--red)} .log-status-skipped{color:var(--text-faint)} .log-status-pending{color:var(--amber)}
+    .sug-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:12px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;transition:all .2s ease}
+    .sug-card:hover{background:rgba(255,255,255,.025);box-shadow:0 4px 16px rgba(0,0,0,.2)}
+    .sug-card.priority-high{border-left-color:var(--red)} .sug-card.priority-medium{border-left-color:var(--amber)} .sug-card.priority-low{border-left-color:var(--blue)}
+    .sug-icon{width:38px;height:38px;border-radius:var(--r-sm);display:grid;place-items:center}
+    .empty-state-icon{animation:floatIcon 3s ease-in-out infinite}
+    @keyframes floatIcon{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    @keyframes dropdown-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+<body>
+
+<!-- ============ Sidebar / Topbar (mesma estrutura padrão) ============ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark"><span>V</span></div>
+    <div class="brand-text"><span class="brand-name">VEXX AI</span><span class="brand-tagline">Business Suite</span></div>
+    <button class="sidebar-collapse-btn" onclick="toggleCollapse()"><i data-lucide="panel-left-close" size="16"></i></button>
+  </div>
+  <div class="sidebar-search" onclick="openCommandPalette()"><i data-lucide="search" size="14"></i><span>Buscar...</span><kbd>⌘K</kbd></div>
+  <nav class="sidebar-nav">
+    <div class="nav-group"><span class="nav-group-label">Principal</span>
+      <a href="/dashboard"  class="nav-link"><span class="nav-link-icon"><i data-lucide="layout-dashboard" size="16"></i></span><span class="nav-link-label">Dashboard</span></a>
+      <a href="/crm"        class="nav-link"><span class="nav-link-icon"><i data-lucide="users" size="16"></i></span><span class="nav-link-label">CRM</span></a>
+      <a href="/finance"    class="nav-link"><span class="nav-link-icon"><i data-lucide="wallet" size="16"></i></span><span class="nav-link-label">Financeiro</span></a>
+      <a href="/automation" class="nav-link active"><span class="nav-link-icon"><i data-lucide="zap" size="16"></i></span><span class="nav-link-label">Automação</span></a>
+    </div>
+    <div class="nav-group"><span class="nav-group-label">Inteligência</span>
+      <a href="/ai-assistant" class="nav-link"><span class="nav-link-icon"><i data-lucide="bot" size="16"></i></span><span class="nav-link-label">IA Assistente</span></a>
+      <a href="/analytics"    class="nav-link"><span class="nav-link-icon"><i data-lucide="bar-chart-2" size="16"></i></span><span class="nav-link-label">Analytics</span></a>
+    </div>
+    <div class="nav-group"><span class="nav-group-label">Conta</span>
+      <a href="/settings" class="nav-link"><span class="nav-link-icon"><i data-lucide="settings" size="16"></i></span><span class="nav-link-label">Configurações</span></a>
+      <a href="/logout"   class="nav-link nav-link-danger"><span class="nav-link-icon"><i data-lucide="log-out" size="16"></i></span><span class="nav-link-label">Sair</span></a>
+    </div>
+  </nav>
+  <div class="sidebar-user" onclick="toggleUserDropdown()">
+    <div class="user-avi" id="s-user-avi">U</div>
+    <div class="user-meta"><span class="user-meta-name" id="s-user-name">—</span><span class="user-meta-company" id="s-user-company">—</span></div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-btn" onclick="toggleMobileSidebar()"><i data-lucide="menu" size="18"></i></button>
+    <div class="topbar-breadcrumb"><span class="topbar-page">Automações</span></div>
+  </div>
+  <div class="topbar-center"><div class="topbar-search" onclick="openCommandPalette()"><i data-lucide="search" size="14"></i><span>Buscar...</span><kbd>⌘K</kbd></div></div>
+  <div class="topbar-right">
+    <div class="topbar-plan"><i data-lucide="zap" size="12"></i> <span id="topbar-plan-label">Free</span></div>
+    <div class="topbar-user" onclick="toggleUserDropdown()">
+      <div class="topbar-user-avi" id="t-user-avi">U</div>
+      <div class="topbar-user-info"><span id="t-user-name">—</span><i data-lucide="chevron-down" size="12"></i></div>
+    </div>
+  </div>
+</header>
+
+<div class="user-dropdown" id="user-dropdown">
+  <div class="user-dropdown-header"><div class="user-avi user-avi-lg" id="d-user-avi">U</div><div><p class="user-dropdown-name" id="d-user-name">—</p><p class="user-dropdown-email" id="d-user-email">—</p></div></div>
+  <div class="dropdown-divider"></div>
+  <a href="/dashboard" class="dropdown-item"><i data-lucide="layout-dashboard" size="14"></i> Dashboard</a>
+  <a href="/settings" class="dropdown-item"><i data-lucide="settings" size="14"></i> Configurações</a>
+  <div class="dropdown-divider"></div>
+  <a href="/logout" class="dropdown-item dropdown-item-danger"><i data-lucide="log-out" size="14"></i> Sair</a>
+</div>
+<div class="cmd-overlay" id="cmd-overlay" onclick="closeCommandPalette()">
+  <div class="cmd-palette" onclick="event.stopPropagation()">
+    <div class="cmd-input-row"><i data-lucide="search" size="16"></i><input type="text" class="cmd-input" id="cmd-input" placeholder="Buscar..." oninput="filterCommands(this.value)" onkeydown="cmdKeyDown(event)"><kbd class="cmd-esc">ESC</kbd></div>
+    <div class="cmd-results" id="cmd-results"></div>
+  </div>
+</div>
+
+<!-- ============ Conteúdo ============ -->
+<main class="page">
+
+  <div class="welcome-row">
+    <div class="welcome-text">
+      <h1>Automações</h1>
+      <p>Escolha um gatilho, defina uma ação e deixe o VEXX trabalhar por você.</p>
+    </div>
+    <div class="welcome-actions">
+      <button class="btn-glass" onclick="goTab('integrations')"><i data-lucide="plug" size="14"></i> Integrações</button>
+      <button class="btn-primary-sm" onclick="openWorkflowModal()"><i data-lucide="plus" size="15"></i> Criar automação</button>
+    </div>
+  </div>
+
+  <div class="auto-guide">
+    <div class="auto-guide-step"><div class="auto-guide-num">1</div><div><div class="auto-guide-title">Quando acontece</div><div class="auto-guide-text">Exemplo: novo lead, pagamento recebido ou fatura vencida.</div></div></div>
+    <div class="auto-guide-step"><div class="auto-guide-num">2</div><div><div class="auto-guide-title">O que fazer</div><div class="auto-guide-text">Enviar mensagem, criar tarefa, avisar a equipe ou gerar relatório.</div></div></div>
+    <div class="auto-guide-step"><div class="auto-guide-num">3</div><div><div class="auto-guide-title">Acompanhar resultado</div><div class="auto-guide-text">Veja no histórico se funcionou, falhou ou foi pulado.</div></div></div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-row kpi-row-sm">
+    <div class="kpi-mini"><div class="kpi-mini-icon" style="background:var(--purple-soft)"><i data-lucide="zap" size="13" style="color:var(--purple)"></i></div><div><div class="kpi-mini-val" id="kpi-total">0</div><div class="kpi-mini-label">Workflows</div></div></div>
+    <div class="kpi-mini"><div class="kpi-mini-icon" style="background:var(--green-soft)"><i data-lucide="play" size="13" style="color:var(--green)"></i></div><div><div class="kpi-mini-val" id="kpi-active">0</div><div class="kpi-mini-label">Ativos</div></div></div>
+    <div class="kpi-mini"><div class="kpi-mini-icon" style="background:var(--blue-soft)"><i data-lucide="repeat" size="13" style="color:var(--blue)"></i></div><div><div class="kpi-mini-val" id="kpi-runs">0</div><div class="kpi-mini-label">Execuções</div></div></div>
+    <div class="kpi-mini"><div class="kpi-mini-icon" style="background:var(--teal-soft)"><i data-lucide="check-circle" size="13" style="color:var(--teal)"></i></div><div><div class="kpi-mini-val" id="kpi-success">100%</div><div class="kpi-mini-label">Taxa de sucesso</div></div></div>
+    <div class="kpi-mini"><div class="kpi-mini-icon" style="background:var(--cyan-soft)"><i data-lucide="plug" size="13" style="color:var(--cyan)"></i></div><div><div class="kpi-mini-val" id="kpi-integrations">0</div><div class="kpi-mini-label">Integrações</div></div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="auto-tabs" role="tablist">
+    <button class="auto-tab active" data-tab="workflows"><i data-lucide="workflow" size="14"></i> Minhas automações <span class="badge-count" id="tab-count-workflows">0</span></button>
+    <button class="auto-tab"        data-tab="templates"><i data-lucide="layers" size="14"></i> Modelos prontos</button>
+    <button class="auto-tab"        data-tab="suggestions"><i data-lucide="sparkles" size="14"></i> Sugestões</button>
+    <button class="auto-tab"        data-tab="integrations"><i data-lucide="plug" size="14"></i> Apps conectados <span class="badge-count" id="tab-count-integrations">0</span></button>
+    <button class="auto-tab"        data-tab="logs"><i data-lucide="list" size="14"></i> Histórico</button>
+    <button class="auto-tab"        data-tab="webhooks"><i data-lucide="webhook" size="14"></i> Avançado</button>
+  </div>
+
+  <!-- ── 1. Workflows ── -->
+  <section class="auto-section active" id="section-workflows">
+    <div class="widget-card">
+      <div class="widget-header">
+        <div><h3 class="widget-title">Minhas automações</h3><p class="widget-subtitle">Cada automação segue a regra: quando acontecer algo, faça uma ação.</p></div>
+        <button class="btn-primary-sm" onclick="openWorkflowModal()"><i data-lucide="plus" size="14"></i> Nova</button>
+      </div>
+      <div id="auto-list"><div class="skeleton-item"></div></div>
+    </div>
+  </section>
+
+  <!-- ── 2. Integrações ── -->
+  <section class="auto-section" id="section-integrations">
+    <div class="widget-card" style="margin-bottom:18px">
+      <div class="widget-header">
+        <div><h3 class="widget-title">Apps conectados</h3><p class="widget-subtitle">Ferramentas que o VEXX pode usar nas automações.</p></div>
+      </div>
+      <div id="connected-list"><div class="skeleton-item"></div></div>
+    </div>
+
+    <div class="widget-card">
+      <div class="widget-header">
+        <div><h3 class="widget-title">Conectar novo app</h3><p class="widget-subtitle">Escolha o app e informe as credenciais solicitadas.</p></div>
+      </div>
+      <div class="category-pills" id="category-pills"></div>
+      <div class="provider-grid" id="provider-grid"><div class="skeleton-item" style="height:140px"></div></div>
+    </div>
+  </section>
+
+  <!-- ── 3. Templates ── -->
+  <section class="auto-section" id="section-templates">
+    <div class="widget-card">
+      <div class="widget-header">
+        <div><h3 class="widget-title">Modelos prontos</h3><p class="widget-subtitle">Use um ponto de partida simples e ajuste depois se quiser.</p></div>
+      </div>
+      <div id="templates-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+        <div class="skeleton-item" style="height:120px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 4. Sugestões IA ── -->
+  <section class="auto-section" id="section-suggestions">
+    <div class="widget-card">
+      <div class="widget-header">
+        <div>
+          <h3 class="widget-title">Sugestões para seu negócio</h3>
+          <p class="widget-subtitle">Ideias baseadas nos seus contatos, leads, cobranças e rotina.</p>
+        </div>
+        <button class="btn-ghost btn-sm" onclick="loadSuggestions()"><i data-lucide="refresh-cw" size="13"></i> Atualizar</button>
+      </div>
+      <div id="suggestions-list"><div class="skeleton-item"></div></div>
+    </div>
+  </section>
+
+  <!-- ── 5. Logs ── -->
+  <section class="auto-section" id="section-logs">
+    <div class="widget-card">
+      <div class="widget-header">
+        <div><h3 class="widget-title">Histórico</h3><p class="widget-subtitle">Veja o que rodou e o que precisa de atenção.</p></div>
+        <select class="form-select" id="log-filter" onchange="loadLogs()" style="max-width:160px">
+          <option value="">Todos status</option>
+          <option value="success">Sucesso</option>
+          <option value="error">Erro</option>
+          <option value="skipped">Pulado</option>
+        </select>
+      </div>
+      <div class="log-row" style="background:var(--surface-md);font-weight:600;font-size:.78rem;color:var(--text-muted)">
+        <span>Status</span><span>Resultado</span><span>Quando → faz</span><span style="text-align:right">Data</span>
+      </div>
+      <div id="logs-list"><div class="skeleton-item"></div></div>
+    </div>
+  </section>
+
+  <!-- ── 6. Webhooks ── -->
+  <section class="auto-section" id="section-webhooks">
+    <div class="widget-card">
+      <div class="widget-header">
+        <div><h3 class="widget-title">Webhooks</h3><p class="widget-subtitle">Área avançada para receber eventos de sistemas externos.</p></div>
+      </div>
+      <div style="background:var(--bg-3);padding:18px;border-radius:var(--r);border:1px solid var(--border);margin-bottom:14px">
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:6px">URL para enviar eventos ao VEXX:</div>
+        <code id="webhook-base-url" style="display:block;background:var(--bg);padding:12px;border-radius:var(--r-sm);font-size:.82rem;color:var(--accent-light);word-break:break-all">carregando...</code>
+        <p style="font-size:.78rem;color:var(--text-faint);margin-top:10px;line-height:1.5">
+          Substitua <code style="background:var(--surface-lg);padding:1px 5px;border-radius:4px">{event}</code> pelo evento que deve acionar a automação.<br>
+          Aceita POST com JSON. Exemplo:
+          <code style="background:var(--surface-lg);padding:1px 5px;border-radius:4px;display:block;margin-top:6px">curl -X POST &lt;url&gt;/payment_received -d '{"amount": 1000}'</code>
+        </p>
+      </div>
+
+      <h4 style="font-size:.85rem;margin:18px 0 8px">Eventos suportados</h4>
+      <div id="webhook-events" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ MODAIS ============ -->
+
+<!-- Workflow modal (com multi-step builder + per-step config) -->
+<div class="modal-overlay" id="wf-modal">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header"><h2 id="wf-modal-title">Criar automação</h2><button class="modal-close" onclick="closeModal('wf-modal')">×</button></div>
+    <form id="wf-form">
+      <input type="hidden" id="wf-id">
+
+      <div class="form-group"><label class="form-label">Nome *</label><input type="text" class="form-input" id="wf-name" required></div>
+      <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-textarea" id="wf-desc" rows="2"></textarea></div>
+
+      <div class="form-group">
+        <label class="form-label"><i data-lucide="zap" size="11"></i> Quando isso acontecer *</label>
+        <select class="form-select" id="wf-trigger" required></select>
+      </div>
+
+      <!-- Steps builder -->
+      <div style="margin-top:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <label class="form-label" style="margin:0"><i data-lucide="play" size="11"></i> Então faça isto</label>
+          <button type="button" class="btn-ghost btn-sm" onclick="addStep()"><i data-lucide="plus" size="12"></i> Adicionar ação</button>
+        </div>
+        <div id="wf-steps" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+
+      <div style="background:var(--surface-md);border-radius:var(--r-sm);padding:10px 12px;margin-top:14px;font-size:.74rem;color:var(--text-faint);line-height:1.6">
+        <strong style="color:var(--text-muted)">💡 Dica:</strong> nos campos de email e telefone, digite diretamente ou busque contatos pelo nome. Múltiplos destinatários podem ser separados por vírgula.
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('wf-modal')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i data-lucide="save" size="14"></i> Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Connect provider modal -->
+<div class="modal-overlay" id="connect-modal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h2 id="connect-modal-title">Conectar</h2>
+      <button class="modal-close" onclick="closeModal('connect-modal')">×</button>
+    </div>
+    <p id="connect-modal-desc" style="color:var(--text-muted);font-size:.85rem;margin-bottom:18px"></p>
+    <form id="connect-form">
+      <input type="hidden" id="connect-provider">
+      <div class="form-group">
+        <label class="form-label">Apelido</label>
+        <input type="text" class="form-input" id="connect-name" placeholder="Ex: Conta principal">
+      </div>
+      <div id="connect-fields"></div>
+      <p style="font-size:.72rem;color:var(--text-faint);margin-top:8px">
+        <i data-lucide="lock" size="10" style="display:inline;vertical-align:-1px"></i>
+        Suas credenciais ficam criptografadas no banco.
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('connect-modal')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i data-lucide="plug" size="14"></i> Conectar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+<div id="toast-container"></div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth-check.js"></script>
+<script src="/js/sidebar.js"></script>
+<script src="/js/page-shell.js"></script>
+<script src="/js/automation.js?v=5-oauth-fallback"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

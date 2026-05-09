@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatórios — VEXX AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/widgets.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark"><span>V</span></div>
+    <div class="brand-text"><span class="brand-name">VEXX AI</span><span class="brand-tagline">Business Suite</span></div>
+    <button class="sidebar-collapse-btn" onclick="toggleCollapse()"><i data-lucide="panel-left-close" size="16"></i></button>
+  </div>
+  <div class="sidebar-search" onclick="openCommandPalette()"><i data-lucide="search" size="14"></i><span>Buscar...</span><kbd>⌘K</kbd></div>
+  <nav class="sidebar-nav">
+    <div class="nav-group"><span class="nav-group-label">Principal</span>
+      <a href="/dashboard"  class="nav-link"><span class="nav-link-icon"><i data-lucide="layout-dashboard" size="16"></i></span><span class="nav-link-label">Dashboard</span></a>
+      <a href="/crm"        class="nav-link"><span class="nav-link-icon"><i data-lucide="users" size="16"></i></span><span class="nav-link-label">CRM</span></a>
+      <a href="/finance"    class="nav-link"><span class="nav-link-icon"><i data-lucide="wallet" size="16"></i></span><span class="nav-link-label">Financeiro</span></a>
+      <a href="/automation" class="nav-link"><span class="nav-link-icon"><i data-lucide="zap" size="16"></i></span><span class="nav-link-label">Automação</span></a>
+    </div>
+    <div class="nav-group"><span class="nav-group-label">Inteligência</span>
+      <a href="/ai-assistant" class="nav-link"><span class="nav-link-icon"><i data-lucide="bot" size="16"></i></span><span class="nav-link-label">IA Assistente</span></a>
+      <a href="/analytics"    class="nav-link"><span class="nav-link-icon"><i data-lucide="bar-chart-2" size="16"></i></span><span class="nav-link-label">Analytics</span></a>
+      <a href="/reports"      class="nav-link active"><span class="nav-link-icon"><i data-lucide="file-text" size="16"></i></span><span class="nav-link-label">Relatórios</span></a>
+    </div>
+    <div class="nav-group"><span class="nav-group-label">Conta</span>
+      <a href="/settings" class="nav-link"><span class="nav-link-icon"><i data-lucide="settings" size="16"></i></span><span class="nav-link-label">Configurações</span></a>
+      <a href="/logout"   class="nav-link nav-link-danger"><span class="nav-link-icon"><i data-lucide="log-out" size="16"></i></span><span class="nav-link-label">Sair</span></a>
+    </div>
+  </nav>
+  <div class="sidebar-user" onclick="toggleUserDropdown()">
+    <div class="user-avi" id="s-user-avi">U</div>
+    <div class="user-meta"><span class="user-meta-name" id="s-user-name">—</span><span class="user-meta-company" id="s-user-company">—</span></div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-btn" onclick="toggleMobileSidebar()"><i data-lucide="menu" size="18"></i></button>
+    <div class="topbar-breadcrumb"><span class="topbar-page">Relatórios</span></div>
+  </div>
+  <div class="topbar-center"><div class="topbar-search" onclick="openCommandPalette()"><i data-lucide="search" size="14"></i><span>Buscar...</span><kbd>⌘K</kbd></div></div>
+  <div class="topbar-right">
+    <div class="topbar-plan"><i data-lucide="zap" size="12"></i> <span id="topbar-plan-label">Free</span></div>
+    <div class="topbar-user" onclick="toggleUserDropdown()">
+      <div class="topbar-user-avi" id="t-user-avi">U</div>
+      <div class="topbar-user-info"><span id="t-user-name">—</span><i data-lucide="chevron-down" size="12"></i></div>
+    </div>
+  </div>
+</header>
+
+<div class="user-dropdown" id="user-dropdown">
+  <div class="user-dropdown-header"><div class="user-avi user-avi-lg" id="d-user-avi">U</div><div><p class="user-dropdown-name" id="d-user-name">—</p><p class="user-dropdown-email" id="d-user-email">—</p></div></div>
+  <div class="dropdown-divider"></div>
+  <a href="/dashboard" class="dropdown-item"><i data-lucide="layout-dashboard" size="14"></i> Dashboard</a>
+  <a href="/settings" class="dropdown-item"><i data-lucide="settings" size="14"></i> Configurações</a>
+  <div class="dropdown-divider"></div>
+  <a href="/logout" class="dropdown-item dropdown-item-danger"><i data-lucide="log-out" size="14"></i> Sair</a>
+</div>
+<div class="cmd-overlay" id="cmd-overlay" onclick="closeCommandPalette()">
+  <div class="cmd-palette" onclick="event.stopPropagation()">
+    <div class="cmd-input-row"><i data-lucide="search" size="16"></i><input type="text" class="cmd-input" id="cmd-input" placeholder="Buscar..." oninput="filterCommands(this.value)" onkeydown="cmdKeyDown(event)"><kbd class="cmd-esc">ESC</kbd></div>
+    <div class="cmd-results" id="cmd-results"></div>
+  </div>
+</div>
+
+<main class="page">
+
+  <div class="welcome-row">
+    <div class="welcome-text">
+      <h1>Relatórios Executivos</h1>
+      <p>Gere PDFs profissionais com KPIs, gráficos e recomendações estratégicas.</p>
+    </div>
+    <div class="welcome-actions">
+      <button class="btn-primary-sm" id="gen-btn" onclick="generateReport()">
+        <i data-lucide="file-plus" size="15"></i> Gerar relatório agora
+      </button>
+    </div>
+  </div>
+
+  <!-- Hero card -->
+  <div class="widget-card" style="background:linear-gradient(135deg,rgba(109,40,217,0.08),rgba(67,56,202,0.04));border-color:rgba(109,40,217,0.2);margin-bottom:24px">
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,var(--accent-hover),#4338ca);border-radius:var(--r-lg);display:grid;place-items:center;box-shadow:0 8px 24px var(--accent-glow)">
+        <i data-lucide="file-text" size="24" style="color:#fff"></i>
+      </div>
+      <div>
+        <h3 class="widget-title" style="margin-bottom:4px">Relatório executivo profissional</h3>
+        <p class="widget-subtitle" style="margin:0">
+          Inclui KPIs do mês, gráfico de receita vs despesas (30d), pipeline de vendas,
+          top categorias de receita e recomendações estratégicas geradas automaticamente.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Histórico -->
+  <div class="widget-card">
+    <div class="widget-header">
+      <div><h3 class="widget-title">Histórico</h3><p class="widget-subtitle">PDFs já gerados</p></div>
+      <button class="btn-ghost btn-sm" onclick="loadReports()"><i data-lucide="refresh-cw" size="13"></i> Atualizar</button>
+    </div>
+    <div id="reports-list"><div class="skeleton-item"></div></div>
+  </div>
+
+</main>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+<div id="toast-container"></div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth-check.js"></script>
+<script src="/js/sidebar.js"></script>
+<script src="/js/page-shell.js"></script>
+<script>
+async function loadReports() {
+  const list = document.getElementById('reports-list');
+  try {
+    const res = await vexxAPI.get('/api/reports/list');
+    const items = res.data || [];
+
+    if (!items.length) {
+      list.innerHTML = `
+        <div style="padding:36px;text-align:center;color:var(--text-faint)">
+          <i data-lucide="file-x" size="32" style="margin-bottom:12px"></i>
+          <p style="font-size:.88rem;margin-bottom:6px">Nenhum relatório gerado ainda</p>
+          <p style="font-size:.78rem">Clique em "Gerar relatório agora" para criar o primeiro PDF.</p>
+        </div>`;
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+
+    list.innerHTML = items.map(r => `
+      <div class="tx-item" style="padding:14px 18px">
+        <div class="tx-icon" style="background:var(--accent-soft);color:var(--accent-light)">
+          <i data-lucide="file-text" size="14"></i>
+        </div>
+        <div class="tx-info">
+          <div class="tx-desc">${r.filename}</div>
+          <div class="tx-date">${new Date(r.created_at).toLocaleString('pt-BR')} · ${r.size_kb} KB</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <a href="/api/reports/download/${r.filename}" class="btn btn-primary btn-sm" download>
+            <i data-lucide="download" size="12"></i> Baixar
+          </a>
+          <button class="btn-ghost btn-icon btn-sm" onclick="deleteReport('${r.filename}')" title="Remover" style="color:var(--red)">
+            <i data-lucide="trash-2" size="13"></i>
+          </button>
+        </div>
+      </div>`).join('');
+    if (window.lucide) lucide.createIcons();
+  } catch (err) {
+    list.innerHTML = '<div style="color:var(--red);padding:16px">Erro ao carregar relatórios.</div>';
+  }
+}
+
+async function generateReport() {
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:13px;height:13px"></div> Gerando...';
+
+  try {
+    const res = await vexxAPI.post('/api/reports/generate', {});
+    showToast('Relatório gerado com sucesso!', 'success');
+    loadReports();
+    /* Auto-download */
+    if (res.data?.download_url) {
+      setTimeout(() => window.location.href = res.data.download_url, 600);
+    }
+  } catch (err) {
+    showToast(err.message || 'Erro ao gerar', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="file-plus" size="15"></i> Gerar relatório agora';
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+async function deleteReport(filename) {
+  if (!confirm(`Remover ${filename}?`)) return;
+  try {
+    await vexxAPI.delete(`/api/reports/${filename}`);
+    showToast('Removido', 'success');
+    loadReports();
+  } catch (err) { showToast(err.message || 'Erro', 'error'); }
+}
+
+document.addEventListener('DOMContentLoaded', loadReports);
+lucide.createIcons();
+</script>
+</body>
+</html>

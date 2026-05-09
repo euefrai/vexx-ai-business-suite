@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planos — VEXX AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/widgets.css">
+  <style>
+    .pricing-page { max-width: 1100px; margin: 0 auto; padding: 60px 24px; }
+    .pricing-header { text-align: center; margin-bottom: 48px; }
+    .pricing-header h1 { font-size: 2.5rem; letter-spacing: -0.04em; margin-bottom: 12px; }
+    .pricing-header p { font-size: 1.05rem; color: var(--text-muted); max-width: 640px; margin: 0 auto; }
+    .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; max-width: 1100px; margin: 0 auto; }
+    .top-nav a { font-size: .88rem; color: var(--text-muted); }
+    .top-nav .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+    .top-nav .brand-logo { width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent-hover), #4338ca); border-radius: 10px; display: grid; place-items: center; color: #fff; font-weight: 800; box-shadow: 0 4px 14px var(--accent-glow); }
+
+    .plan-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 32px 28px;
+      transition: all var(--t);
+      position: relative;
+    }
+    .plan-card.featured {
+      border-color: rgba(109,40,217,0.4);
+      box-shadow: 0 12px 40px rgba(109,40,217,0.18);
+      background: linear-gradient(135deg, rgba(91,33,182,0.07), rgba(67,56,202,0.04));
+      transform: scale(1.03);
+    }
+    .plan-card.featured::before {
+      content: 'POPULAR';
+      position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--accent-hover), #4338ca);
+      color: #fff; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+      padding: 3px 12px; border-radius: 99px;
+    }
+    .plan-name { font-size: 1.1rem; font-weight: 650; }
+    .plan-price { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.04em; margin: 14px 0 4px; }
+    .plan-price small { font-size: 0.95rem; color: var(--text-faint); font-weight: 400; }
+    .plan-features { list-style: none; margin: 22px 0 28px; padding: 0; }
+    .plan-features li { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 0.88rem; color: var(--text-muted); }
+    .plan-features li::before { content: '✓'; color: var(--green); font-weight: 800; }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="/" class="brand"><span class="brand-logo">V</span> VEXX AI</a>
+  <div style="display:flex;gap:14px">
+    <a href="/login">Entrar</a>
+    <a href="/register" class="btn-primary-sm" style="text-decoration:none">Começar grátis</a>
+  </div>
+</nav>
+
+<main class="pricing-page">
+
+  <header class="pricing-header">
+    <h1>Planos que crescem com você</h1>
+    <p>Comece grátis, escolha o plano ideal quando crescer. Sem fidelidade. Cancele quando quiser.</p>
+  </header>
+
+  <div id="plans-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;align-items:start">
+    <div class="skeleton-item" style="height:480px"></div>
+    <div class="skeleton-item" style="height:480px"></div>
+    <div class="skeleton-item" style="height:480px"></div>
+  </div>
+
+  <div style="margin-top:60px;text-align:center">
+    <h2 style="font-size:1.25rem;margin-bottom:24px">Todas as ferramentas que você precisa</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;text-align:left">
+      <div class="widget-card"><i data-lucide="users" size="22" style="color:var(--blue)"></i><h3 class="widget-title" style="margin:10px 0 6px">CRM Completo</h3><p class="widget-subtitle">Contatos, leads e pipeline de vendas em um só lugar.</p></div>
+      <div class="widget-card"><i data-lucide="wallet" size="22" style="color:var(--green)"></i><h3 class="widget-title" style="margin:10px 0 6px">Financeiro</h3><p class="widget-subtitle">Controle receitas, despesas e faturas automaticamente.</p></div>
+      <div class="widget-card"><i data-lucide="zap" size="22" style="color:var(--purple)"></i><h3 class="widget-title" style="margin:10px 0 6px">Automações</h3><p class="widget-subtitle">Crie fluxos que economizam horas de trabalho manual.</p></div>
+      <div class="widget-card"><i data-lucide="bot" size="22" style="color:var(--accent-light)"></i><h3 class="widget-title" style="margin:10px 0 6px">IA Empresarial</h3><p class="widget-subtitle">Assistente que entende seu negócio e gera insights.</p></div>
+    </div>
+  </div>
+
+  <p style="margin-top:60px;text-align:center;font-size:.85rem;color:var(--text-faint)">
+    Dúvidas? <a href="mailto:contact@vexx.ai" style="color:var(--accent-light)">Fale com a gente</a>
+  </p>
+
+</main>
+
+<script>
+async function loadPlans() {
+  try {
+    const res = await fetch('/api/billing/plans');
+    const json = await res.json();
+    const plans = json.data || [];
+    const grid = document.getElementById('plans-grid');
+
+    grid.innerHTML = plans.map((p, i) => {
+      const featured = p.id === 'pro';
+      const price = p.price === 0 ? 'Grátis' : `R$ ${p.price}<small>/mês</small>`;
+      return `
+        <div class="plan-card ${featured ? 'featured' : ''}">
+          <div class="plan-name">${p.name}</div>
+          <div class="plan-price">${price}</div>
+          <p style="color:var(--text-faint);font-size:.82rem">${p.id === 'free' ? 'Para começar a usar' : p.id === 'pro' ? 'Para empresas em crescimento' : 'Para grandes operações'}</p>
+          <ul class="plan-features">
+            ${p.features.map(f => `<li>${f}</li>`).join('')}
+          </ul>
+          <a href="${p.id === 'free' ? '/register?plan=' + p.id : '#'}" ${p.id !== 'free' ? `onclick="alert('Em desenvolvimento 🚧'); return false;"` : ''} class="btn ${featured ? 'btn-primary' : 'btn-secondary'} btn-full">
+            ${p.id !== 'free' ? '<i data-lucide="lock" size="14"></i> ' : ''}${p.id === 'free' ? 'Começar Grátis' : 'Assinar ' + p.name}
+          </a>
+        </div>`;
+    }).join('');
+  } catch {
+    document.getElementById('plans-grid').innerHTML = '<p style="color:var(--red)">Erro ao carregar planos.</p>';
+  }
+}
+loadPlans();
+lucide.createIcons();
+</script>
+
+</body>
+</html>
