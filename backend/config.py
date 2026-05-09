@@ -64,10 +64,11 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'DATABASE_URL',
-        f"sqlite:///{os.path.join(BASE_DIR, 'database', 'vexx.db')}"
-    )
+    _db_url = os.environ.get('DATABASE_URL', '')
+    if _db_url and _db_url.startswith('postgres://'):
+        _db_url = _db_url.replace('postgres://', 'postgresql://', 1)
+        
+    SQLALCHEMY_DATABASE_URI = _db_url or f"sqlite:///{os.path.join(BASE_DIR, 'database', 'vexx.db')}"
     # Cookies só trafegam por HTTPS
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = 'Strict'
