@@ -250,24 +250,35 @@ def _send_discord(user_id, params, ctx):
     if not text:
         return False, 'Mensagem vazia.'
 
-    r = requests.post(creds['webhook_url'], json={'content': text}, timeout=15)
-    
-    if r.status_code == 429:
-        try:
-            # Discord API might return retry_after in seconds or ms depending on version
-            retry_data = r.json()
-            retry_after = float(retry_data.get('retry_after', 1.0))
-            if retry_after > 10:  # If it's too large, it might be ms
-                retry_after = retry_after / 1000.0
-        except Exception:
-            retry_after = 1.0
-            
-        time.sleep(min(retry_after + 0.1, 5.0))
+    max_retries = 5
+    for attempt in range(max_retries):
         r = requests.post(creds['webhook_url'], json={'content': text}, timeout=15)
+        
+        if r.status_code in [429, 500, 502, 503, 504]:
+            if r.status_code == 429:
+                try:
+                    retry_data = r.json()
+                    retry_after = float(retry_data.get('retry_after', 1.0))
+                    if retry_after > 10:
+                        retry_after = retry_after / 1000.0
+                except Exception:
+                    retry_after = 1.0 * (attempt + 1)
+            else:
+                retry_after = 1.5 * (attempt + 1)
+                
+            # If it's the last attempt, don't sleep, just let it fail
+            if attempt == max_retries - 1:
+                break
+                
+            time.sleep(retry_after + 0.2)
+            continue
 
-    if r.status_code >= 400:
-        return False, f'Discord erro {r.status_code}'
-    return True, 'Discord notificado'
+        if r.status_code >= 400:
+            return False, f'Discord erro {r.status_code}'
+            
+        return True, 'Discord notificado'
+        
+    return False, f'Discord erro {r.status_code} após {max_retries} tentativas'
 
 
 def _call_webhook(user_id, params, ctx):
