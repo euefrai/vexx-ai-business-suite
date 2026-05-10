@@ -76,7 +76,8 @@ def api_toggle(auto_id):
 @login_required
 def api_run(auto_id):
     ok, msg = simulate_run(current_user.id, auto_id)
-    return jsonify({'success': ok, 'message': msg}), (200 if ok else 404)
+    status_code = 200 if ok else (404 if 'não encontrada' in msg else 400)
+    return jsonify({'success': ok, 'message': msg}), status_code
 
 
 @automation_bp.route('/api/automation/<int:auto_id>', methods=['DELETE'])
@@ -149,7 +150,8 @@ def api_disconnect(integ_id):
 @login_required
 def api_test_integration(integ_id):
     ok, msg = test_integration(current_user.id, integ_id)
-    return jsonify({'success': ok, 'message': msg}), (200 if ok else 404)
+    status_code = 200 if ok else (404 if 'não encontrada' in msg else 400)
+    return jsonify({'success': ok, 'message': msg}), status_code
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

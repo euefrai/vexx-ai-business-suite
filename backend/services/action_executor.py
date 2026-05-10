@@ -241,6 +241,7 @@ def _send_slack(user_id, params, ctx):
 
 
 def _send_discord(user_id, params, ctx):
+    import time
     creds = get_credentials(user_id, 'discord')
     if not creds:
         return False, 'Discord não conectado.'
@@ -250,6 +251,20 @@ def _send_discord(user_id, params, ctx):
         return False, 'Mensagem vazia.'
 
     r = requests.post(creds['webhook_url'], json={'content': text}, timeout=15)
+    
+    if r.status_code == 429:
+        try:
+            # Discord API might return retry_after in seconds or ms depending on version
+            retry_data = r.json()
+            retry_after = float(retry_data.get('retry_after', 1.0))
+            if retry_after > 10:  # If it's too large, it might be ms
+                retry_after = retry_after / 1000.0
+        except Exception:
+            retry_after = 1.0
+            
+        time.sleep(min(retry_after + 0.1, 5.0))
+        r = requests.post(creds['webhook_url'], json={'content': text}, timeout=15)
+
     if r.status_code >= 400:
         return False, f'Discord erro {r.status_code}'
     return True, 'Discord notificado'
